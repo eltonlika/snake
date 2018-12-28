@@ -27,6 +27,7 @@ typedef struct {
 typedef struct {
     uint width;
     uint height;
+    uint speed; /* speed of game: in cells travelled per second */
     Position food;
     Snake snake;
 } Game;
@@ -94,8 +95,10 @@ static void snake_grow(Snake *snake) {
     const uint current_length = snake->length;
     const uint last_cell_idx = current_length - 1;
     const uint new_cell_idx = current_length;
+
     const Position last_cell = snake->cells[last_cell_idx];
     const Position new_cell = position_previous(last_cell, snake->direction);
+
     snake->cells[new_cell_idx] = new_cell;
     snake->length = current_length + 1;
 }
@@ -141,38 +144,48 @@ static void snake_print(Snake *snake) {
     printf("--------------\n");
 }
 
+/* generate random food position which does not collide with snake body */
+void game_generate_random_food(Game *game) {
+    Position random_food_position;
+    Snake *snake = &game->snake;
+
+    do {
+        random_food_position = position_random(game->width, game->height);
+    } while (snake_is_body_cell(snake, random_food_position));
+
+    game->food = random_food_position;
+}
+
 Game *game_init() {
-    uint game_width, game_height, max_snake_length, initial_snake_length;
-    Position initial_snake_position, initial_food_position;
+    uint game_width, game_height;
+    uint initial_speed;
+    uint max_snake_length, initial_snake_length;
+    Position initial_snake_position;
     Direction initial_snake_direction;
     Game *game;
-    Snake *snake;
 
     /* initialize random generator */
     srand(time(NULL));
 
+    /* initial game parameters */
     game_width = 80;
     game_height = 80;
+    initial_speed = 2; /* initial speed of the game (cells/second) */
     max_snake_length = game_width * game_height;
-    initial_snake_length = 3;
+    initial_snake_length = 4;
     initial_snake_position.x = game_width / 2;
     initial_snake_position.y = game_height / 2;
-    initial_snake_direction = DOWN;
+    initial_snake_direction = UP;
 
     game = malloc(sizeof(Game));
     game->width = game_width;
     game->height = game_height;
+    game->speed = initial_speed;
 
-    snake = &game->snake;
-    snake_init(snake, max_snake_length, initial_snake_length,
+    snake_init(&game->snake, max_snake_length, initial_snake_length,
                initial_snake_position, initial_snake_direction);
 
-    /* generate random food position which does not collide with snake body */
-    do {
-        initial_food_position = position_random(game_width, game_height);
-    } while (snake_is_body_cell(snake, initial_food_position));
-
-    game->food = initial_food_position;
+    game_generate_random_food(game);
 
     return game;
 }
@@ -187,23 +200,69 @@ void game_free(Game *game) {
     }
 }
 
+void game_tick(Game *game) {
+    Snake *snake = &game->snake;
+    Position ahead = snake_ahead(snake);
+
+    /* check if snake is about to collide with it's body */
+    if (snake_is_body_cell(snake, ahead)) {
+        printf("SNAKE DEAD\n");
+        return;
+    }
+
+    if (position_equal(game->food, ahead)) {
+        printf("SNAKE EAT\n");
+        snake_grow(snake);
+        game_generate_random_food(game);
+    }
+
+    snake_step(snake);
+}
+
 int main() {
     Game *game = game_init();
     Snake *snake = &game->snake;
-    snake_print(snake);
 
-    snake_grow(snake);
-    snake_print(snake);
+    printf("Food: %d %d\n", game->food.x, game->food.y);
 
-    snake_step(snake);
+    game_tick(game);
     snake_print(snake);
 
     snake_turn(snake, RIGHT);
-    snake_step(snake);
+
+    game_tick(game);
     snake_print(snake);
 
-    snake_step(snake);
+    snake_turn(snake, DOWN);
+
+    game_tick(game);
     snake_print(snake);
+
+    snake_turn(snake, LEFT);
+
+    game_tick(game);
+    snake_print(snake);
+
+    game_tick(game);
+    snake_print(snake);
+
+    game_tick(game);
+    snake_print(snake);
+
+    // snake_print(snake);
+
+    // snake_grow(snake);
+    // snake_print(snake);
+
+    // snake_step(snake);
+    // snake_print(snake);
+
+    // snake_turn(snake, RIGHT);
+    // snake_step(snake);
+    // snake_print(snake);
+
+    // snake_step(snake);
+    // snake_print(snake);
 
     game_free(game);
 
