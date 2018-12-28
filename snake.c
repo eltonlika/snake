@@ -249,20 +249,19 @@ int main() {
     game_tick(game);
     snake_print(snake);
 
-    // snake_print(snake);
+    /* snake_print(snake);
 
-    // snake_grow(snake);
-    // snake_print(snake);
+    snake_grow(snake);
+    snake_print(snake);
+    snake_step(snake);
+    snake_print(snake);
 
-    // snake_step(snake);
-    // snake_print(snake);
+    snake_turn(snake, RIGHT);
+    snake_step(snake);
+    snake_print(snake);
 
-    // snake_turn(snake, RIGHT);
-    // snake_step(snake);
-    // snake_print(snake);
-
-    // snake_step(snake);
-    // snake_print(snake);
+    snake_step(snake);
+    snake_print(snake); */
 
     game_free(game);
 
