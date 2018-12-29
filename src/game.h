@@ -5,7 +5,15 @@
 
 typedef enum { Playing, Paused, Lost, Won } GameStatus;
 
-typedef enum { KeyPause, KeyUp, KeyRight, KeyDown, KeyLeft } GameInput;
+typedef enum {
+    NoInput = 0,
+    KeyQuit,
+    KeyPause,
+    KeyUp,
+    KeyRight,
+    KeyDown,
+    KeyLeft
+} GameInput;
 
 typedef struct {
     uint score;

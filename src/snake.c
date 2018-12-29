@@ -73,5 +73,4 @@ void snake_print(Snake *snake) {
     for (idx = 0; idx < snake->length; idx++) {
         printf("%d %d\n", snake->cells[idx].x, snake->cells[idx].y);
     }
-    printf("--------------\n");
 }

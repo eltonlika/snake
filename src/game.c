@@ -32,7 +32,7 @@ Game *game_init() {
     /* initial game parameters */
     game_width = 80;
     game_height = 80;
-    initial_speed = 2; /* initial speed of the game (cells/second) */
+    initial_speed = 3; /* initial speed of the game (cells/second) */
     max_snake_length = game_width * game_height;
     initial_snake_length = 4;
     initial_snake_position.x = game_width / 2;
@@ -79,7 +79,7 @@ void game_update(Game *game) {
     /* check if snake is about to collide with it's body */
     if (snake_is_body_cell(snake, position_ahead)) {
         game->status = Lost;
-        printf("You lost! Snake ate itself!\n");
+        /* printf("You lost! Snake ate itself!\n"); */
         return;
     }
 
@@ -88,7 +88,7 @@ void game_update(Game *game) {
     if (position_equal(game->food, position_ahead)) {
         snake_grow(snake);
         game->score++;
-        printf("Snake ate one apple!\n");
+        /* printf("Snake ate one apple!\n"); */
 
         /* if snake reached maximum length then game won */
         if (snake->length == snake->max_length) {
@@ -108,6 +108,8 @@ void game_process_input(Game *game, GameInput input) {
     }
 
     switch (input) {
+    case NoInput:
+        return;
     case KeyPause:
         game->status = Paused;
         break;
@@ -122,6 +124,8 @@ void game_process_input(Game *game, GameInput input) {
         break;
     case KeyLeft:
         game->snake.direction = DirectionLeft;
+        break;
+    default:
         break;
     }
 }
