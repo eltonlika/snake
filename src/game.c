@@ -18,8 +18,7 @@ static void game_generate_random_food(Game *game) {
     game->food = new_random_food_position;
 }
 
-Game *game_init() {
-    uint game_width, game_height;
+Game *game_init(uint game_width, uint game_height) {
     uint initial_speed;
     uint max_snake_length, initial_snake_length;
     Position initial_snake_position;
@@ -30,9 +29,7 @@ Game *game_init() {
     init_random_generator();
 
     /* initial game parameters */
-    game_width = 80;
-    game_height = 80;
-    initial_speed = 3; /* initial speed of the game (cells/second) */
+    initial_speed = 5; /* initial speed of the game (cells/second) */
     max_snake_length = game_width * game_height;
     initial_snake_length = 4;
     initial_snake_position.x = game_width / 2;

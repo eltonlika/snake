@@ -7,6 +7,7 @@ typedef enum { Playing, Paused, Lost, Won } GameStatus;
 
 typedef enum {
     NoInput = 0,
+    KeySpeedUp,
     KeyQuit,
     KeyPause,
     KeyUp,
@@ -25,7 +26,7 @@ typedef struct {
     Snake snake;
 } Game;
 
-Game *game_init();
+Game *game_init(uint game_width, uint game_height);
 
 void game_free(Game *game);
 
