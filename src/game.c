@@ -105,7 +105,7 @@ void game_process_input(Game *game, GameInput input) {
     case NoInput:
         break;
     case KeyPause:
-        game->status = Paused;
+        game->status = (game->status == Paused ? Playing : Paused);
         break;
     case KeyUp:
         snake_turn(&game->snake, DirectionUp);
