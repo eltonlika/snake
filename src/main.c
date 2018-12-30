@@ -1,137 +1,88 @@
 #include "game.h"
+#include "input.h"
+#include "random.h"
+#include "renderer.h"
 #include <curses.h>
-#include <signal.h>
 #include <stdio.h>
-#include <unistd.h>
 
-static WINDOW *window;
-static __sighandler_t old_resize_handler;
-
-void new_resize_handler(int sig) {
-    int height, width;
-
-    if (old_resize_handler != NULL) {
-        old_resize_handler(sig);
-    }
-
-    getmaxyx(window, height, width);
-    mvprintw(0, 0, "RESIZED to %d x %d\r", width, height);
-    wrefresh(window);
-}
-
-GameInput read_input() {
-    const int c = wgetch(window);
-
-    switch (c) {
-    case ERR:
-        return NoInput;
-    case KEY_UP:
-        return KeyUp;
-    case KEY_RIGHT:
-        return KeyRight;
-    case KEY_DOWN:
-        return KeyDown;
-    case KEY_LEFT:
-        return KeyLeft;
-    case 's':
-        return KeySpeedUp;
-    case 'S':
-        return KeySpeedUp;
-    case 'p':
-        return KeyPause;
-    case 'P':
-        return KeyPause;
-    case 'q':
-        return KeyQuit;
-    case 'Q':
-        return KeyQuit;
-    }
-
-    return NoInput;
-}
-
-void render(Game *game) {
-    const Snake *snake = &game->snake;
-    const Position *cells = snake->cells;
-    const uint length = snake->length;
-    uint idx;
-    Position food_pos, cell_pos;
-
-    werase(window);
-
-    for (idx = 0; idx < length; idx++) {
-        cell_pos = cells[idx];
-        mvwaddch(window, cell_pos.y, cell_pos.x, '#');
-    }
-
-    food_pos = game->food;
-    mvwaddch(window, food_pos.y, food_pos.x, 'o');
-
-    wrefresh(window);
-}
+void quit(WINDOW *window, Game *game);
 
 int main() {
+    const unsigned int FRAMES_PER_SECOND = 10;
+    const float MICROSECONDS_PER_FRAME = 1000000 / FRAMES_PER_SECOND;
+    const unsigned int sleep_time_us = MICROSECONDS_PER_FRAME;
+
+    unsigned int game_width, game_height;
+    WINDOW *window;
     Game *game;
     GameInput input;
-    uint sleep_time_us;
-    int game_height, game_width;
+    GameStatus status;
 
-    window = initscr();
-    noecho();
-    curs_set(0); /* set cursor invisible */
-    cbreak();
-    nodelay(window, TRUE);
-    keypad(window, TRUE);
-    old_resize_handler = signal(SIGWINCH, new_resize_handler);
+    /* initialize random number generator */
+    random_init();
 
-    getmaxyx(window, game_height, game_width);
-    game = game_init((uint)game_width, (uint)game_height);
+    /* initialize rendering window */
+    window = renderer_init();
+
+    /* get console width and height */
+    game_width = renderer_get_max_width(window);
+    game_height = renderer_get_max_height(window);
+
+    /* initialize game */
+    game = game_init(game_width, game_height);
 
     /* render first frame of game state */
-    render(game);
+    renderer_render(window, game);
 
-    while (game->status != Won && game->status != Lost) {
-        /* calculate render timeout */
-        sleep_time_us = (uint)(1000000 / game->speed);
+    /* main game loop */
+    while (1) {
 
-        /* process all buffered inputs */
-        input = read_input();
-        while (input != NoInput) {
-            if (input == KeyQuit) {
-                goto quit;
-            }
-            if (input == KeySpeedUp) {
-                sleep_time_us = sleep_time_us / 40;
-            }
+        /* if game ended then quit */
+        status = game->status;
+        if (status == Won || status == Lost) {
+            quit(window, game);
+            return 0;
+        }
+
+        /* process game input */
+        input = input_get_key(window);
+        if (input == NoInput) {
+            /* left empty on purpose */
+        } else if (input == KeyQuit) {
+            quit(window, game);
+            return 0;
+        } else {
             game_process_input(game, input);
-            input = read_input();
         }
 
         /* update game */
         game_update(game);
 
         /* render game */
-        render(game);
+        renderer_render(window, game);
 
         usleep(sleep_time_us);
-    };
+    }
 
-quit:
-    endwin();
+    return 0;
+}
+
+void quit(WINDOW *window, Game *game) {
+    /* stop renderer */
+    renderer_end(window);
 
     /* print game finish status */
     switch (game->status) {
     case Won:
-        printf("You WON!!!\n");
+        printf("You WON!!!\n\n");
         break;
     case Lost:
-        printf("You lost.\n");
+        printf("You lost.\n\n");
         break;
     default:
         break;
     }
 
+    /* free memory */
     game_free(game);
-
-    return 0;
 }

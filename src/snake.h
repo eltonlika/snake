@@ -4,18 +4,21 @@
 #include "position.h"
 
 typedef struct {
-    uint max_length;
-    uint length;
+    unsigned int max_length;
+    unsigned int length;
     Direction direction;
     Position *cells;
 } Snake;
 
-void snake_init(Snake *snake, uint max_length, uint initial_length,
-                Position initial_position, Direction initial_direction);
+void snake_init(Snake *snake, unsigned int max_length,
+                unsigned int initial_length, Position initial_position,
+                Direction initial_direction);
 
-Position snake_get_position_ahead(Snake *snake);
+Position snake_get_head_position(Snake *snake);
 
-uint snake_is_body_cell(Snake *snake, Position position);
+int snake_is_body_cell_position(Snake *snake, Position position);
+
+int snake_is_tail_cell_position(Snake *snake, Position position);
 
 void snake_step(Snake *snake);
 

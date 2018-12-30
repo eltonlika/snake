@@ -1,9 +1,10 @@
 #include "snake.h"
-#include <stdio.h>
+#include <stdlib.h>
 
-void snake_init(Snake *snake, uint max_length, uint initial_length,
-                Position initial_position, Direction initial_direction) {
-    uint idx;
+void snake_init(Snake *snake, unsigned int max_length,
+                unsigned int initial_length, Position initial_position,
+                Direction initial_direction) {
+    unsigned int idx;
 
     snake->max_length = max_length;
     snake->length = initial_length;
@@ -17,14 +18,12 @@ void snake_init(Snake *snake, uint max_length, uint initial_length,
     }
 }
 
-Position snake_get_position_ahead(Snake *snake) {
-    return position_next(snake->cells[0], snake->direction);
-}
+Position snake_get_head_position(Snake *snake) { return snake->cells[0]; }
 
 void snake_grow(Snake *snake) {
-    const uint current_length = snake->length;
-    const uint last_cell_idx = current_length - 1;
-    const uint new_cell_idx = current_length;
+    const unsigned int current_length = snake->length;
+    const unsigned int last_cell_idx = current_length - 1;
+    const unsigned int new_cell_idx = current_length;
 
     const Position last_cell = snake->cells[last_cell_idx];
     const Position new_cell = position_previous(last_cell, snake->direction);
@@ -34,11 +33,11 @@ void snake_grow(Snake *snake) {
 }
 
 void snake_step(Snake *snake) {
-    uint idx;
+    unsigned int idx;
     for (idx = snake->length - 1; idx > 0; idx--) {
         snake->cells[idx] = snake->cells[idx - 1];
     }
-    snake->cells[0] = snake_get_position_ahead(snake);
+    snake->cells[0] = position_next(snake->cells[0], snake->direction);
 }
 
 void snake_turn(Snake *snake, Direction new_direction) {
@@ -58,9 +57,9 @@ void snake_turn(Snake *snake, Direction new_direction) {
     }
 }
 
-uint snake_is_body_cell(Snake *snake, Position position) {
-    uint idx;
-    for (idx = 0; idx < snake->length; idx++) {
+static int is_snake_cell(Snake *snake, unsigned int from, Position position) {
+    unsigned int idx;
+    for (idx = from; idx < snake->length; idx++) {
         if (position_equal(snake->cells[idx], position)) {
             return 1;
         }
@@ -68,9 +67,12 @@ uint snake_is_body_cell(Snake *snake, Position position) {
     return 0;
 }
 
-void snake_print(Snake *snake) {
-    uint idx;
-    for (idx = 0; idx < snake->length; idx++) {
-        printf("%d %d\n", snake->cells[idx].x, snake->cells[idx].y);
-    }
+/* check all cells of the snake's body */
+int snake_is_body_cell_position(Snake *snake, Position position) {
+    return is_snake_cell(snake, 0, position);
+}
+
+/* check all cells of the snake's body except the head */
+int snake_is_tail_cell_position(Snake *snake, Position position) {
+    return is_snake_cell(snake, 1, position);
 }

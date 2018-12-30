@@ -1,6 +1,8 @@
-#include "utils.h"
+#include "random.h"
+#include <stdlib.h>
+#include <time.h>
 
-void init_random_generator() {
+void random_init() {
     time_t current_time = time(NULL);
     clock_t current_clock = clock();
     srand(current_time ^ current_clock);

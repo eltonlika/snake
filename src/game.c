@@ -1,32 +1,28 @@
 #include "game.h"
-#include "utils.h"
-#include <stdio.h>
+#include <stdlib.h>
 
 /* generate random food position which does not collide with snake body */
 static void game_generate_random_food(Game *game) {
-    const uint width = game->width;
-    const uint height = game->height;
+    const unsigned int width = game->width;
+    const unsigned int height = game->height;
     const Position old_food_position = game->food;
     Snake *snake = &game->snake;
     Position new_random_food_position;
 
     do {
         new_random_food_position = position_random(width, height);
-    } while (snake_is_body_cell(snake, new_random_food_position) ||
+    } while (snake_is_body_cell_position(snake, new_random_food_position) ||
              position_equal(old_food_position, new_random_food_position));
 
     game->food = new_random_food_position;
 }
 
-Game *game_init(uint game_width, uint game_height) {
-    uint initial_speed;
-    uint max_snake_length, initial_snake_length;
+Game *game_init(unsigned int game_width, unsigned int game_height) {
+    unsigned int initial_speed;
+    unsigned int max_snake_length, initial_snake_length;
     Position initial_snake_position;
     Direction initial_snake_direction;
     Game *game;
-
-    /* initialize random generator */
-    init_random_generator();
 
     /* initial game parameters */
     initial_speed = 5; /* initial speed of the game (cells/second) */
@@ -63,7 +59,7 @@ void game_free(Game *game) {
 
 void game_update(Game *game) {
     Snake *snake;
-    Position position_ahead;
+    Position snake_head;
 
     /* if not playing then do not process updates */
     if (game->status != Playing) {
@@ -71,21 +67,22 @@ void game_update(Game *game) {
     }
 
     snake = &game->snake;
-    position_ahead = snake_get_position_ahead(snake);
 
-    /* check if snake is about to collide with it's body */
-    if (snake_is_body_cell(snake, position_ahead)) {
+    /* step snake forward */
+    snake_step(snake);
+
+    snake_head = snake_get_head_position(snake);
+
+    /* check if snake collided with it's tail */
+    if (snake_is_tail_cell_position(snake, snake_head)) {
         game->status = Lost;
-        /* printf("You lost! Snake ate itself!\n"); */
         return;
     }
 
-    snake_step(snake);
-
-    if (position_equal(game->food, position_ahead)) {
+    /* check if snake ate food */
+    if (position_equal(game->food, snake_head)) {
         snake_grow(snake);
         game->score++;
-        /* printf("Snake ate one apple!\n"); */
 
         /* if snake reached maximum length then game won */
         if (snake->length == snake->max_length) {
@@ -106,21 +103,21 @@ void game_process_input(Game *game, GameInput input) {
 
     switch (input) {
     case NoInput:
-        return;
+        break;
     case KeyPause:
         game->status = Paused;
         break;
     case KeyUp:
-        game->snake.direction = DirectionUp;
+        snake_turn(&game->snake, DirectionUp);
         break;
     case KeyRight:
-        game->snake.direction = DirectionRight;
+        snake_turn(&game->snake, DirectionRight);
         break;
     case KeyDown:
-        game->snake.direction = DirectionDown;
+        snake_turn(&game->snake, DirectionDown);
         break;
     case KeyLeft:
-        game->snake.direction = DirectionLeft;
+        snake_turn(&game->snake, DirectionLeft);
         break;
     default:
         break;

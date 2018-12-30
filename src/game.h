@@ -1,32 +1,22 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "input.h"
 #include "snake.h"
 
 typedef enum { Playing, Paused, Lost, Won } GameStatus;
 
-typedef enum {
-    NoInput = 0,
-    KeySpeedUp,
-    KeyQuit,
-    KeyPause,
-    KeyUp,
-    KeyRight,
-    KeyDown,
-    KeyLeft
-} GameInput;
-
 typedef struct {
-    uint score;
-    uint width;
-    uint height;
-    uint speed; /* speed of game: in cells travelled per second */
+    unsigned int score;
+    unsigned int width;
+    unsigned int height;
+    unsigned int speed; /* speed of game: in cells travelled per second */
     GameStatus status;
     Position food;
     Snake snake;
 } Game;
 
-Game *game_init(uint game_width, uint game_height);
+Game *game_init(unsigned int game_width, unsigned int game_height);
 
 void game_free(Game *game);
 
