@@ -16,7 +16,9 @@ typedef struct {
     Snake snake;
 } Game;
 
-Game *game_init(unsigned int game_width, unsigned int game_height);
+Game *game_new(unsigned int game_width, unsigned int game_height);
+
+void game_init(Game *game, unsigned int game_width, unsigned int game_height);
 
 void game_free(Game *game);
 

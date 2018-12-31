@@ -17,34 +17,30 @@ static void game_generate_random_food(Game *game) {
     game->food = new_random_food_position;
 }
 
-Game *game_init(unsigned int game_width, unsigned int game_height) {
-    unsigned int initial_speed;
-    unsigned int max_snake_length, initial_snake_length;
+Game *game_new(unsigned int game_width, unsigned int game_height) {
+    Game *game = malloc(sizeof(Game));
+    game_init(game, game_width, game_height);
+    return game;
+}
+
+void game_init(Game *game, unsigned int game_width, unsigned int game_height) {
+    const unsigned int max_snake_length = game_width * game_height;
+    const unsigned int initial_snake_length = 4;
+    const Direction initial_snake_direction = DirectionDown;
     Position initial_snake_position;
-    Direction initial_snake_direction;
-    Game *game;
+    initial_snake_position.x = (unsigned int)game_width / 2;
+    initial_snake_position.y = (unsigned int)game_height / 2;
 
-    /* initial game parameters */
-    initial_speed = 5; /* initial speed of the game (cells/second) */
-    max_snake_length = game_width * game_height;
-    initial_snake_length = 4;
-    initial_snake_position.x = game_width / 2;
-    initial_snake_position.y = game_height / 2;
-    initial_snake_direction = DirectionDown;
-
-    game = malloc(sizeof(Game));
     game->score = 0;
     game->width = game_width;
     game->height = game_height;
-    game->speed = initial_speed;
+    game->speed = 5; /* initial speed of the game (cells/second) */
     game->status = Playing;
 
     snake_init(&game->snake, max_snake_length, initial_snake_length,
                initial_snake_position, initial_snake_direction);
 
     game_generate_random_food(game);
-
-    return game;
 }
 
 void game_free(Game *game) {

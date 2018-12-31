@@ -25,9 +25,9 @@ int main() {
     input_init(screen->main_window);
 
     /* initialize game */
-    game = game_init(screen->width, screen->height);
+    game = game_new(screen->width, screen->height);
 
-    /* render first frame of game state */
+    /* render first frame of new game */
     renderer_render(screen, game);
 
     /* main game loop */
@@ -44,10 +44,18 @@ int main() {
         input_key = input_get_key(screen->main_window);
         if (input_key == NoInput) {
             /* left empty on purpose */
+        } else if (input_key == KeyNewGame) {
+            /* reinitialize game struct to create new game */
+            game_init(game, screen->width, screen->height);
+            /* render first frame of new game */
+            renderer_render(screen, game);
+            /* skip to next iteration */
+            continue;
         } else if (input_key == KeyQuit) {
             quit(screen, game);
             return 0;
         } else {
+            /* for every other key input, send it for game processing */
             game_process_input(game, input_key);
         }
 

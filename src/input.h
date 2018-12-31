@@ -5,6 +5,7 @@
 
 typedef enum {
     NoInput = 0,
+    KeyNewGame,
     KeyPause,
     KeyQuit,
     KeyUp,

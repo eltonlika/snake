@@ -30,6 +30,10 @@ GameInput input_get_key(WINDOW *window) {
         return KeyQuit;
     case 'Q':
         return KeyQuit;
+    case 'n':
+        return KeyNewGame;
+    case 'N':
+        return KeyNewGame;
     }
 
     return NoInput;
