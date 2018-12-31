@@ -13,6 +13,8 @@ typedef enum {
     KeyLeft
 } GameInput;
 
-GameInput input_get_key(WINDOW *source);
+void input_init(WINDOW *window);
+
+GameInput input_get_key(WINDOW *window);
 
 #endif /* INPUT_H */

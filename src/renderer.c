@@ -1,18 +1,25 @@
 #include "renderer.h"
 #include <curses.h>
+#include <stdlib.h>
 
-WINDOW *renderer_init() {
-    WINDOW *window = initscr();
-    noecho();
-    cbreak();
+Screen *renderer_init() {
+    Screen *screen = malloc(sizeof(Screen));
+    WINDOW *main_window = initscr();
+    unsigned int width, height;
+
     curs_set(0); /* set cursor invisible */
-    nodelay(window, TRUE);
-    keypad(window, TRUE);
-    werase(window);
-    return window;
+    werase(main_window);
+    wrefresh(main_window);
+    getmaxyx(main_window, height, width);
+
+    /* set playfield width and height smaller to account for window borders */
+    screen->width = width - 2;
+    screen->height = height - 2;
+    screen->main_window = main_window;
+    return screen;
 }
 
-void renderer_render(WINDOW *window, Game *game) {
+void renderer_render(Screen *screen, Game *game) {
     const Snake *snake = &game->snake;
     const Position *cells = snake->cells;
     const Position head = cells[0];
@@ -21,19 +28,23 @@ void renderer_render(WINDOW *window, Game *game) {
     const char food_character = 'X';
     const char body_character = '#';
     char head_character;
+    WINDOW *window = screen->main_window;
     Position food_pos, cell_pos;
-
     unsigned int idx;
 
     werase(window);
 
-    /* print tail */
+    /* render window border */
+    box(window, 0, 0);
+
+    /* render tail */
     for (idx = 1; idx < length; idx++) {
         cell_pos = cells[idx];
-        mvwaddch(window, cell_pos.y, cell_pos.x, body_character);
+        /* +1 coordinates to account for window border */
+        mvwaddch(window, cell_pos.y + 1, cell_pos.x + 1, body_character);
     }
 
-    /* print head */
+    /* render snake head */
     switch (direction) {
     case DirectionUp:
         head_character = 'A';
@@ -48,20 +59,19 @@ void renderer_render(WINDOW *window, Game *game) {
         head_character = '>';
         break;
     }
-    mvwaddch(window, head.y, head.x, head_character);
+    /* +1 coordinates to account for window border */
+    mvwaddch(window, head.y + 1, head.x + 1, head_character);
 
-    /* print food */
+    /* render food */
     food_pos = game->food;
-    mvwaddch(window, food_pos.y, food_pos.x, food_character);
+    /* +1 coordinates to account for window border */
+    mvwaddch(window, food_pos.y + 1, food_pos.x + 1, food_character);
 
+    /* refresh window to draw new renderings */
     wrefresh(window);
 }
 
-unsigned int renderer_get_max_width(WINDOW *window) { return getmaxx(window); }
-
-unsigned int renderer_get_max_height(WINDOW *window) { return getmaxy(window); }
-
-void renderer_end(WINDOW *window) {
-    werase(window);
+void renderer_end(Screen *screen) {
+    werase(screen->main_window);
     endwin();
 }

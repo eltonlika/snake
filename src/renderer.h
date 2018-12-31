@@ -4,14 +4,16 @@
 #include "game.h"
 #include <curses.h>
 
-WINDOW *renderer_init();
+typedef struct {
+    unsigned int width;
+    unsigned int height;
+    WINDOW *main_window;
+} Screen;
 
-void renderer_render(WINDOW *window, Game *game);
+Screen *renderer_init();
 
-unsigned int renderer_get_max_width(WINDOW *window);
+void renderer_render(Screen *screen, Game *game);
 
-unsigned int renderer_get_max_height(WINDOW *window);
-
-void renderer_end(WINDOW *window);
+void renderer_end(Screen *screen);
 
 #endif /* RENDERER_H */

@@ -1,6 +1,13 @@
 #include "input.h"
 #include <curses.h>
 
+void input_init(WINDOW *window) {
+    noecho();
+    cbreak();
+    nodelay(window, TRUE);
+    keypad(window, TRUE);
+}
+
 GameInput input_get_key(WINDOW *window) {
     const int c = wgetch(window);
 
