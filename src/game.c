@@ -29,8 +29,8 @@ Game *game_new(unsigned int game_width, unsigned int game_height) {
 
 void game_init(Game *game, unsigned int game_width, unsigned int game_height) {
     Position initial_snake_position;
-    initial_snake_position.x = (unsigned int)game_width / 2;
-    initial_snake_position.y = (unsigned int)game_height / 2;
+    initial_snake_position.x = (int)game_width / 2;
+    initial_snake_position.y = (int)game_height / 2;
     game->width = game_width;
     game->height = game_height;
     game->max_score = game_width * game_height - 1;
@@ -55,16 +55,17 @@ static int collides_snake(Game *game, Position check_position) {
     Snake *snake = &game->snake;
     const Position last_cell_position = snake->cells[snake->length - 1];
     if (position_equal(check_position, last_cell_position)) {
-        return 0; /* no self collision because the current last cell will move */
+        /* no self collision because the current last cell will move */
+        return 0;
     }
     return snake_occupies_position(snake, check_position);
 }
 
 static int collides_border(Game *game, Position check_position) {
-    unsigned int newx = check_position.x;
-    unsigned int newy = check_position.y;
-    return (newx < 0 || newx >= game->width ||
-            newy < 0 || newy >= game->height);
+    const int newx = check_position.x;
+    const int newy = check_position.y;
+    return (newx < 0 || newx >= (int)game->width ||
+            newy < 0 || newy >= (int)game->height);
 }
 
 static int collides_food(Game *game, Position check_position) {

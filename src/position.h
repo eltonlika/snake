@@ -9,8 +9,8 @@ typedef enum {
 } Direction;
 
 typedef struct {
-    unsigned int x;
-    unsigned int y;
+    int x;
+    int y;
 } Position;
 
 int position_equal(Position p1, Position p2);

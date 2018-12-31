@@ -2,10 +2,10 @@
 #include "random.h"
 
 /* amount of change on plane X for each step, indexed by Direction */
-static const signed char XDelta[4] = {0, 1, 0, -1};
+static const int XDelta[4] = {0, 1, 0, -1};
 
 /* amount of change on plane Y for each step, indexed by Direction */
-static const signed char YDelta[4] = {-1, 0, 1, 0};
+static const int YDelta[4] = {-1, 0, 1, 0};
 
 int position_equal(Position p1, Position p2) {
     return p1.x == p2.x && p1.y == p2.y;
@@ -13,8 +13,8 @@ int position_equal(Position p1, Position p2) {
 
 Position position_random(unsigned int width, unsigned int height) {
     Position random;
-    random.x = (unsigned int)random_number(0, width);
-    random.y = (unsigned int)random_number(0, height);
+    random.x = random_number(0, width);
+    random.y = random_number(0, height);
     return random;
 }
 
