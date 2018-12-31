@@ -4,13 +4,18 @@
 #include "input.h"
 #include "snake.h"
 
-typedef enum { Playing, Paused, Lost, Won } GameStatus;
+typedef enum {
+    Playing,
+    Paused,
+    Lost,
+    Won
+} GameStatus;
 
 typedef struct {
-    unsigned int score;
     unsigned int width;
     unsigned int height;
-    unsigned int speed; /* speed of game: in cells travelled per second */
+    unsigned int max_score;
+    unsigned int score;
     GameStatus status;
     Position food;
     Snake snake;
