@@ -2,16 +2,19 @@
 #include "position.h"
 #include <stdlib.h>
 
+const unsigned int FRAMES_PER_SECOND = 10;
+const float MICROSECONDS_PER_FRAME = 1000000 / FRAMES_PER_SECOND;
+
 /* generate random food position which does not collide with snake body */
 static void generate_random_food(Game *game) {
-    const unsigned int width = game->width;
-    const unsigned int height = game->height;
+    const unsigned int max_x = game->width - 1;
+    const unsigned int max_y = game->height - 1;
     const Position old_food_position = game->food;
     Snake *snake = &game->snake;
     Position new_random_food_position;
 
     do {
-        new_random_food_position = position_random(width, height);
+        new_random_food_position = position_random(max_x, max_y);
     } while (snake_occupies_position(snake, new_random_food_position) ||
              position_equal(new_random_food_position, old_food_position));
 
@@ -32,8 +35,9 @@ void game_init(Game *game, unsigned int game_width, unsigned int game_height) {
     game->height = game_height;
     game->max_score = game_width * game_height - 1;
     game->score = 0;
+    game->micros_per_frame = MICROSECONDS_PER_FRAME;
     game->status = Playing;
-    snake_init(&game->snake, initial_snake_position, DirectionDown);
+    snake_init(&game->snake, initial_snake_position, DirectionLeft);
     generate_random_food(game);
 }
 
@@ -59,8 +63,8 @@ static int collides_snake(Game *game, Position check_position) {
 static int collides_border(Game *game, Position check_position) {
     unsigned int newx = check_position.x;
     unsigned int newy = check_position.y;
-    return (newx <= 0 || newx >= (game->width - 1) ||
-            newy <= 0 || newy >= (game->height - 1));
+    return (newx < 0 || newx >= game->width ||
+            newy < 0 || newy >= game->height);
 }
 
 static int collides_food(Game *game, Position check_position) {
@@ -140,6 +144,12 @@ void game_process_input(Game *game, GameInput input) {
         break;
     case KeyLeft:
         snake_turn(&game->snake, DirectionLeft);
+        break;
+    case KeySpeedIncrease:
+        game->micros_per_frame *= 0.9;
+        break;
+    case KeySpeedDecrease:
+        game->micros_per_frame *= 1.1;
         break;
     default:
         break;

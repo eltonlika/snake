@@ -16,6 +16,7 @@ typedef struct {
     unsigned int height;
     unsigned int max_score;
     unsigned int score;
+    unsigned int micros_per_frame;
     GameStatus status;
     Position food;
     Snake snake;

@@ -8,6 +8,8 @@ typedef enum {
     KeyNewGame,
     KeyPause,
     KeyQuit,
+    KeySpeedIncrease,
+    KeySpeedDecrease,
     KeyUp,
     KeyRight,
     KeyDown,

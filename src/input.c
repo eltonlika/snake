@@ -34,6 +34,10 @@ GameInput input_get_key(WINDOW *window) {
         return KeyNewGame;
     case 'N':
         return KeyNewGame;
+    case 's':
+        return KeySpeedIncrease;
+    case 'S':
+        return KeySpeedDecrease;
     }
 
     return NoInput;

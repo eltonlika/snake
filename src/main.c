@@ -7,9 +7,6 @@
 void quit(Screen *screen, Game *game);
 
 int main() {
-    const unsigned int FRAMES_PER_SECOND = 10;
-    const float MICROSECONDS_PER_FRAME = 1000000 / FRAMES_PER_SECOND;
-    const unsigned int sleep_time_micros = MICROSECONDS_PER_FRAME;
     Screen *screen;
     Game *game;
     GameInput input_key;
@@ -32,7 +29,6 @@ int main() {
 
     /* main game loop */
     while (1) {
-
         /* if game ended then quit */
         status = game->status;
         if (status == Won || status == Lost) {
@@ -65,7 +61,7 @@ int main() {
         /* render game */
         renderer_render(screen, game);
 
-        usleep(sleep_time_micros);
+        usleep(game->micros_per_frame);
     }
 
     return 0;
