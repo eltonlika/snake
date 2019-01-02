@@ -2,6 +2,7 @@
 #define SNAKE_H
 
 #include "position.h"
+#include "utils.h"
 
 typedef struct {
     unsigned int max_length;
@@ -14,7 +15,7 @@ void snake_init(Snake *snake, Position initial_position, Direction initial_direc
 
 Position snake_get_next_head_position(Snake *snake);
 
-int snake_occupies_position(Snake *snake, Position position);
+Bool snake_occupies_position(Snake *snake, Position position);
 
 void snake_step_forward(Snake *snake);
 

@@ -1,6 +1,8 @@
 #ifndef POSITION_H
 #define POSITION_H
 
+#include "utils.h"
+
 typedef enum {
     DirectionUp = 0,
     DirectionRight = 1,
@@ -13,7 +15,7 @@ typedef struct {
     int y;
 } Position;
 
-int position_equal(Position p1, Position p2);
+Bool position_equal(Position p1, Position p2);
 
 Position position_random(unsigned int width, unsigned int height);
 

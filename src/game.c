@@ -1,5 +1,6 @@
 #include "game.h"
 #include "position.h"
+#include "utils.h"
 #include <stdlib.h>
 
 const unsigned int FRAMES_PER_SECOND = 10;
@@ -23,6 +24,8 @@ static void generate_random_food(Game *game) {
 
 Game *game_new(unsigned int game_width, unsigned int game_height) {
     Game *game = malloc(sizeof(Game));
+    ASSERT_ALLOC(game);
+
     game_init(game, game_width, game_height);
     return game;
 }
@@ -51,28 +54,28 @@ void game_free(Game *game) {
     }
 }
 
-static int collides_snake(Game *game, Position check_position) {
+static Bool collides_snake(Game *game, Position check_position) {
     Snake *snake = &game->snake;
     const Position last_cell_position = snake->cells[snake->length - 1];
     if (position_equal(check_position, last_cell_position)) {
         /* no self collision because the current last cell will move */
-        return 0;
+        return False;
     }
     return snake_occupies_position(snake, check_position);
 }
 
-static int collides_border(Game *game, Position check_position) {
+static Bool collides_border(Game *game, Position check_position) {
     const int newx = check_position.x;
     const int newy = check_position.y;
     return (newx < 0 || newx >= (int)game->width ||
             newy < 0 || newy >= (int)game->height);
 }
 
-static int collides_food(Game *game, Position check_position) {
+static Bool collides_food(Game *game, Position check_position) {
     return position_equal(game->food, check_position);
 }
 
-static int max_score_reached(Game *game) {
+static Bool max_score_reached(Game *game) {
     return game->score == game->max_score;
 }
 

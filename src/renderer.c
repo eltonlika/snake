@@ -1,12 +1,17 @@
 #include "renderer.h"
+#include "utils.h"
 #include <curses.h>
 #include <stdlib.h>
 
 Screen *renderer_init() {
-    Screen *screen = malloc(sizeof(Screen));
-    WINDOW *main_window = initscr();
+    Screen *screen;
+    WINDOW *main_window;
     unsigned int width, height;
 
+    screen = malloc(sizeof(Screen));
+    ASSERT_ALLOC(screen);
+
+    main_window = initscr();
     curs_set(0); /* set cursor invisible */
     werase(main_window);
     wrefresh(main_window);
