@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 const unsigned int FRAMES_PER_SECOND = 10;
-const float MICROSECONDS_PER_FRAME = 1000000 / FRAMES_PER_SECOND;
+const float MILLISECONDS_PER_FRAME = 1000 / FRAMES_PER_SECOND;
 
 /* generate random food position which does not collide with snake body */
 static void generate_random_food(Game *game) {
@@ -38,7 +38,7 @@ void game_init(Game *game, unsigned int game_width, unsigned int game_height) {
     game->height = game_height;
     game->max_score = game_width * game_height - 1;
     game->score = 0;
-    game->micros_per_frame = MICROSECONDS_PER_FRAME;
+    game->milliseconds_per_frame = MILLISECONDS_PER_FRAME;
     game->status = Playing;
     snake_init(&game->snake, initial_snake_position, DirectionLeft);
     generate_random_food(game);
@@ -150,10 +150,10 @@ void game_process_input(Game *game, GameInput input) {
         snake_turn(&game->snake, DirectionLeft);
         break;
     case KeySpeedIncrease:
-        game->micros_per_frame *= 0.9;
+        game->milliseconds_per_frame *= 0.9;
         break;
     case KeySpeedDecrease:
-        game->micros_per_frame *= 1.1;
+        game->milliseconds_per_frame *= 1.1;
         break;
     default:
         break;

@@ -1,8 +1,12 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#define _XOPEN_SOURCE 500
+
 #include <stdio.h>
 #include <stdlib.h>
+
+void game_sleep(unsigned int milliseconds);
 
 typedef enum {
     False = 0,

@@ -2,14 +2,14 @@
 #include "utils.h"
 #include <stdlib.h>
 
-static const unsigned int BUFFER_CAPACITY = 4;
+static const unsigned int SNAKE_CAPACITY_INCREASE = 4;
 
 void snake_init(Snake *snake, Position initial_position, Direction initial_direction) {
-    Position *cells = (Position *)malloc(sizeof(Position) * BUFFER_CAPACITY);
+    Position *cells = (Position *)malloc(sizeof(Position) * SNAKE_CAPACITY_INCREASE);
     ASSERT_ALLOC(cells);
 
     cells[0] = initial_position;
-    snake->max_length = BUFFER_CAPACITY;
+    snake->max_length = SNAKE_CAPACITY_INCREASE;
     snake->length = 1;
     snake->direction = initial_direction;
     snake->cells = cells;
@@ -54,7 +54,7 @@ void snake_grow(Snake *snake) {
 
     /* if exceeding max_length then reallocate BUFFER_CAPACITY + current max capacity */
     if (current_length >= max_length) {
-        new_max_length = max_length + BUFFER_CAPACITY;
+        new_max_length = max_length + SNAKE_CAPACITY_INCREASE;
         new_cells_buffer = realloc(cells, sizeof(Position) * new_max_length);
         ASSERT_ALLOC(new_cells_buffer);
 

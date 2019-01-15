@@ -2,6 +2,7 @@
 #include "input.h"
 #include "random.h"
 #include "renderer.h"
+#include "utils.h"
 #include <stdio.h>
 
 void quit(Screen *screen, Game *game);
@@ -61,7 +62,7 @@ int main() {
         /* render game */
         renderer_render(screen, game);
 
-        usleep(game->micros_per_frame);
+        game_sleep(game->milliseconds_per_frame);
     }
 
     return 0;
