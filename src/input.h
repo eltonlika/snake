@@ -18,6 +18,8 @@ typedef enum {
 
 void input_init(WINDOW *window);
 
-GameInput input_get_key(WINDOW *window);
+GameInput input_get_next_key(WINDOW *window);
+
+GameInput input_get_last_key(WINDOW *window);
 
 #endif /* INPUT_H */

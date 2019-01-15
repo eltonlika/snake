@@ -37,8 +37,8 @@ int main() {
             return 0;
         }
 
-        /* process game input */
-        input_key = input_get_key(screen->main_window);
+        /* process game input (only last buffered key) */
+        input_key = input_get_last_key(screen->main_window);
         if (input_key == NoInput) {
             /* left empty on purpose */
         } else if (input_key == KeyNewGame) {
