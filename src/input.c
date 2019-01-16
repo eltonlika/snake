@@ -9,9 +9,9 @@ void input_init(WINDOW *window) {
 }
 
 GameInput input_get_next_key(WINDOW *window) {
-    const int c = wgetch(window);
+    const int input = wgetch(window);
 
-    switch (c) {
+    switch (input) {
     case ERR:
         return NoInput;
     case KEY_UP:
@@ -23,24 +23,21 @@ GameInput input_get_next_key(WINDOW *window) {
     case KEY_LEFT:
         return KeyLeft;
     case 'p':
-        return KeyPause;
     case 'P':
         return KeyPause;
     case 'q':
-        return KeyQuit;
     case 'Q':
         return KeyQuit;
     case 'n':
-        return KeyNewGame;
     case 'N':
         return KeyNewGame;
     case 's':
         return KeySpeedIncrease;
     case 'S':
         return KeySpeedDecrease;
+    default:
+        return NoInput;
     }
-
-    return NoInput;
 }
 
 GameInput input_get_last_key(WINDOW *window) {
