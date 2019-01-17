@@ -12,6 +12,8 @@ typedef struct {
 
 Renderer *renderer_init();
 
+void renderer_free(Renderer *renderer);
+
 void renderer_render(Renderer *renderer, Game *game);
 
 void renderer_end(Renderer *renderer);

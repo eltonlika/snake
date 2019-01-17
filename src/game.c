@@ -184,10 +184,17 @@ Game *game_new(unsigned int game_width, unsigned int game_height) {
 }
 
 void game_free(Game *game) {
+    Snake *snake;
+    GameInput *input_queue;
+
     if (game) {
-        Position *cellsPtr = game->snake.cells;
-        if (cellsPtr) {
-            free(cellsPtr);
+        snake = &game->snake;
+        if (snake) {
+            snake_free(snake);
+        }
+        input_queue = game->input_queue;
+        if (input_queue) {
+            free(input_queue);
         }
         free(game);
     }

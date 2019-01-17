@@ -45,7 +45,8 @@ int main() {
     /* stop renderer */
     renderer_end(renderer);
 
-    /* free game memory */
+    /* free memory */
+    renderer_free(renderer);
     game_free(game);
 
     return 0;

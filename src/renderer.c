@@ -24,6 +24,12 @@ Renderer *renderer_init() {
     return renderer;
 }
 
+void renderer_free(Renderer *renderer) {
+    if (renderer) {
+        free(renderer);
+    }
+}
+
 static const char food_character = 'X';
 static const char body_character = '#';
 

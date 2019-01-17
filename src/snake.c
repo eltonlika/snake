@@ -17,6 +17,17 @@ void snake_init(Snake *snake, Position initial_position, Direction initial_direc
     snake->direction = initial_direction;
 }
 
+void snake_free(Snake *snake) {
+    Position *cellsPtr;
+
+    if (snake) {
+        cellsPtr = snake->cells;
+        if (cellsPtr) {
+            free(cellsPtr);
+        }
+    }
+}
+
 Position snake_get_next_head_position(Snake *snake) {
     return position_next(snake->cells[0], snake->direction);
 }
