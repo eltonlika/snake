@@ -8,12 +8,12 @@ typedef struct {
     unsigned int width;
     unsigned int height;
     WINDOW *main_window;
-} Screen;
+} Renderer;
 
-Screen *renderer_init();
+Renderer *renderer_init();
 
-void renderer_render(Screen *screen, Game *game);
+void renderer_render(Renderer *renderer, Game *game);
 
-void renderer_end(Screen *screen);
+void renderer_end(Renderer *renderer);
 
 #endif /* RENDERER_H */

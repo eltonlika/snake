@@ -3,17 +3,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-static const unsigned int SNAKE_CAPACITY_INCREASE = 4;
+static const unsigned int SNAKE_INITIAL_CAPACITY = 4;
 
 void snake_init(Snake *snake, Position initial_position, Direction initial_direction) {
-    Position *cells = (Position *)malloc(sizeof(Position) * SNAKE_CAPACITY_INCREASE);
-    ASSERT_ALLOC(cells);
-
-    cells[0] = initial_position;
-    snake->max_length = SNAKE_CAPACITY_INCREASE;
+    if (snake->cells != NULL) {
+        free(snake->cells);
+    }
+    snake->cells = (Position *)malloc(sizeof(Position) * SNAKE_INITIAL_CAPACITY);
+    ASSERT_ALLOC(snake->cells);
+    snake->cells[0] = initial_position;
+    snake->max_length = SNAKE_INITIAL_CAPACITY;
     snake->length = 1;
     snake->direction = initial_direction;
-    snake->cells = cells;
 }
 
 Position snake_get_next_head_position(Snake *snake) {
@@ -52,12 +53,11 @@ void snake_grow(Snake *snake) {
     unsigned int new_max_length;
     Position *new_cells_buffer;
 
-    /* if exceeding max_length then reallocate BUFFER_CAPACITY + current max capacity */
+    /* if exceeding max_length then reallocate current max capacity + SNAKE_INITIAL_CAPACITY */
     if (current_length >= max_length) {
-        new_max_length = max_length + SNAKE_CAPACITY_INCREASE;
+        new_max_length = max_length + SNAKE_INITIAL_CAPACITY;
         new_cells_buffer = realloc(cells, sizeof(Position) * new_max_length);
         ASSERT_ALLOC(new_cells_buffer);
-
         snake->max_length = new_max_length;
         snake->cells = new_cells_buffer;
     }

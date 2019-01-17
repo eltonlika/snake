@@ -1,5 +1,5 @@
 #include "position.h"
-#include "random.h"
+#include "utils.h"
 
 /* amount of change on plane X for each step, indexed by Direction */
 static const int XDelta[4] = {0, 1, 0, -1};

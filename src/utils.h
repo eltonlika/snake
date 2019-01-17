@@ -6,7 +6,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void game_sleep(unsigned int milliseconds);
+void random_init();
+
+int random_number(int min_num, int max_num);
+
+void timer_sleep(unsigned int milliseconds);
 
 typedef enum {
     False = 0,

@@ -5,21 +5,19 @@
 
 typedef enum {
     NoInput = 0,
+    KeyUp,
+    KeyRight,
+    KeyDown,
+    KeyLeft,
     KeyNewGame,
     KeyPause,
     KeyQuit,
     KeySpeedIncrease,
-    KeySpeedDecrease,
-    KeyUp,
-    KeyRight,
-    KeyDown,
-    KeyLeft
+    KeySpeedDecrease
 } GameInput;
 
 void input_init(WINDOW *window);
 
 GameInput input_get_next_key(WINDOW *window);
-
-GameInput input_get_last_key(WINDOW *window);
 
 #endif /* INPUT_H */

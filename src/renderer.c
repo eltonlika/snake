@@ -3,13 +3,13 @@
 #include <curses.h>
 #include <stdlib.h>
 
-Screen *renderer_init() {
-    Screen *screen;
+Renderer *renderer_init() {
+    Renderer *renderer;
     WINDOW *main_window;
     unsigned int width, height;
 
-    screen = malloc(sizeof(Screen));
-    ASSERT_ALLOC(screen);
+    renderer = malloc(sizeof(Renderer));
+    ASSERT_ALLOC(renderer);
 
     main_window = initscr();
     curs_set(0); /* set cursor invisible */
@@ -18,22 +18,23 @@ Screen *renderer_init() {
     getmaxyx(main_window, height, width);
 
     /* set playfield width and height smaller to account for window borders */
-    screen->width = width - 2;
-    screen->height = height - 2;
-    screen->main_window = main_window;
-    return screen;
+    renderer->width = width - 2;
+    renderer->height = height - 2;
+    renderer->main_window = main_window;
+    return renderer;
 }
 
-void renderer_render(Screen *screen, Game *game) {
+static const char food_character = 'X';
+static const char body_character = '#';
+
+void renderer_render(Renderer *renderer, Game *game) {
     const Snake *snake = &game->snake;
     const Position *cells = snake->cells;
     const Position head = cells[0];
     const Direction direction = snake->direction;
     const unsigned int length = snake->length;
-    const char food_character = 'X';
-    const char body_character = '#';
     char head_character;
-    WINDOW *window = screen->main_window;
+    WINDOW *window = renderer->main_window;
     Position food_pos, cell_pos;
     unsigned int idx;
 
@@ -72,11 +73,16 @@ void renderer_render(Screen *screen, Game *game) {
     /* +1 coordinates to account for window border */
     mvwaddch(window, food_pos.y + 1, food_pos.x + 1, food_character);
 
+    /* print game over status */
+    if (game->status == GameOver) {
+        wprintw(window, "Game Over! Score: %d\n\n", game->score);
+    }
+
     /* refresh window to draw new renderings */
     wrefresh(window);
 }
 
-void renderer_end(Screen *screen) {
-    werase(screen->main_window);
+void renderer_end(Renderer *renderer) {
+    werase(renderer->main_window);
     endwin();
 }

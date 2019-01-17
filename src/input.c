@@ -39,13 +39,3 @@ GameInput input_get_next_key(WINDOW *window) {
         return NoInput;
     }
 }
-
-GameInput input_get_last_key(WINDOW *window) {
-    GameInput last_key = NoInput, read_key;
-
-    while ((read_key = input_get_next_key(window)) != NoInput) {
-        last_key = read_key;
-    }
-
-    return last_key;
-}
