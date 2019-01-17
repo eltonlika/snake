@@ -73,9 +73,13 @@ void renderer_render(Renderer *renderer, Game *game) {
     /* +1 coordinates to account for window border */
     mvwaddch(window, food_pos.y + 1, food_pos.x + 1, food_character);
 
-    /* print game over status */
+    /* if game over then print score */
     if (game->status == GameOver) {
-        wprintw(window, "Game Over! Score: %d\n\n", game->score);
+        mvwprintw(window,
+                  (renderer->height >> 1) - 1, /* divide by 2 */
+                  (renderer->width >> 1) - 10, /* divide by 2 */
+                  "Game Over! Score: %d",
+                  game->score);
     }
 
     /* refresh window to draw new renderings */
