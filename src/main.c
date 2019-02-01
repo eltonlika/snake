@@ -6,6 +6,7 @@
 
 int main() {
     Renderer *renderer;
+    WINDOW *main_window;
     Game *game;
     GameInput input_key;
 
@@ -14,12 +15,13 @@ int main() {
 
     /* initialize rendering window */
     renderer = renderer_init();
+    main_window = renderer->main_window;
 
     /* initialize curses input */
     input_init(renderer->main_window);
 
     /* initialize game structure */
-    game = game_new(renderer->width, renderer->height);
+    game = game_new(renderer->playfield_width, renderer->playfield_height);
 
     /* render first frame of new game */
     renderer_render(renderer, game);
@@ -28,7 +30,7 @@ int main() {
     while (game->status != Quit) {
 
         /* add all buffered input keys to game input queue */
-        while ((input_key = input_get_next_key(renderer->main_window)) != NoInput) {
+        while ((input_key = input_get_next_key(main_window)) != NoInput) {
             game_queue_input(game, input_key);
         }
 

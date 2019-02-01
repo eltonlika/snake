@@ -19,7 +19,7 @@ static void generate_random_food(Game *game) {
     do {
         new_random_food_position = position_random(max_x, max_y);
     } while (snake_occupies_position(snake, new_random_food_position) ||
-             position_equal(new_random_food_position, old_food_position));
+             position_equal(old_food_position, new_random_food_position));
 
     game->food = new_random_food_position;
 }
@@ -71,29 +71,17 @@ static Bool collides_food(Game *game, Position check_position) {
 }
 
 static Bool max_score_reached(Game *game) {
-    return game->score == game->max_score;
+    return game->score >= game->max_score;
 }
-
-/*
-static GameInput game_peek_input_queue(Game *game) {
-    if (game->input_queue_count > 0) {
-        return game->input_queue[0];
-    }
-    return NoInput;
-}
-*/
 
 static GameInput game_pop_input_queue(Game *game) {
-    const unsigned int current_queue_count = game->input_queue_count;
     GameInput input;
 
-    if (current_queue_count > 0) {
+    if (game->input_queue_count > 0) {
         input = game->input_queue[0];
-
         /* remove element from queue */
         game->input_queue_count--;
-        memmove(game->input_queue, game->input_queue + 1, sizeof(GameInput) * (current_queue_count - 1));
-
+        memmove(game->input_queue, game->input_queue + 1, sizeof(GameInput) * game->input_queue_count);
         return input;
     }
 
@@ -184,31 +172,21 @@ Game *game_new(unsigned int game_width, unsigned int game_height) {
 }
 
 void game_free(Game *game) {
-    Snake *snake;
-    GameInput *input_queue;
-
-    if (game) {
-        snake = &game->snake;
-        if (snake) {
-            snake_free(snake);
-        }
-        input_queue = game->input_queue;
-        if (input_queue) {
-            free(input_queue);
+    if (game != NULL) {
+        snake_free(&game->snake);
+        if (game->input_queue != NULL) {
+            free(game->input_queue);
         }
         free(game);
     }
 }
 
 void game_queue_input(Game *game, GameInput input) {
-    unsigned int new_max_size;
-
     /* if exceeding max_length then reallocate current max capacity + INPUT_QUEUE_INITIAL_CAPACITY */
     if (game->input_queue_count >= game->input_queue_capacity) {
-        new_max_size = game->input_queue_capacity + INPUT_QUEUE_INITIAL_CAPACITY;
-        game->input_queue = realloc(game->input_queue, sizeof(GameInput) * new_max_size);
+        game->input_queue_capacity += INPUT_QUEUE_INITIAL_CAPACITY;
+        game->input_queue = realloc(game->input_queue, sizeof(GameInput) * game->input_queue_capacity);
         ASSERT_ALLOC(game->input_queue);
-        game->input_queue_capacity = new_max_size;
     }
 
     game->input_queue[game->input_queue_count] = input;

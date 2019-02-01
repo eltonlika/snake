@@ -18,12 +18,9 @@ void snake_init(Snake *snake, Position initial_position, Direction initial_direc
 }
 
 void snake_free(Snake *snake) {
-    Position *cellsPtr;
-
-    if (snake) {
-        cellsPtr = snake->cells;
-        if (cellsPtr) {
-            free(cellsPtr);
+    if (snake != NULL) {
+        if (snake->cells != NULL) {
+            free(snake->cells);
         }
     }
 }
@@ -33,11 +30,9 @@ Position snake_get_next_head_position(Snake *snake) {
 }
 
 Bool snake_occupies_position(Snake *snake, Position position) {
-    const unsigned int snake_last_cell_idx = snake->length - 1;
-    const Position *snake_cells = snake->cells;
     unsigned int idx;
-    for (idx = 0; idx <= snake_last_cell_idx; idx++) {
-        if (position_equal(snake_cells[idx], position)) {
+    for (idx = 0; idx < snake->length; idx++) {
+        if (position_equal(snake->cells[idx], position)) {
             return True;
         }
     }
@@ -54,27 +49,19 @@ void snake_step_forward(Snake *snake) {
 }
 
 void snake_grow(Snake *snake) {
-    const unsigned int max_length = snake->max_length;
-    const unsigned int current_length = snake->length;
-    const unsigned int last_cell_idx = current_length - 1;
-    const unsigned int new_cell_idx = current_length;
-    Position *cells = snake->cells;
-    const Position last_cell = cells[last_cell_idx];
+    const Position last_cell = snake->cells[snake->length - 1];
     const Position new_cell = position_previous(last_cell, snake->direction);
-    unsigned int new_max_length;
-    Position *new_cells_buffer;
+    const unsigned int new_cell_idx = snake->length;
 
     /* if exceeding max_length then reallocate current max capacity + SNAKE_INITIAL_CAPACITY */
-    if (current_length >= max_length) {
-        new_max_length = max_length + SNAKE_INITIAL_CAPACITY;
-        new_cells_buffer = realloc(cells, sizeof(Position) * new_max_length);
-        ASSERT_ALLOC(new_cells_buffer);
-        snake->max_length = new_max_length;
-        snake->cells = new_cells_buffer;
+    if (snake->length >= snake->max_length) {
+        snake->max_length += SNAKE_INITIAL_CAPACITY;
+        snake->cells = realloc(snake->cells, sizeof(Position) * snake->max_length);
+        ASSERT_ALLOC(snake->cells);
     }
 
     snake->cells[new_cell_idx] = new_cell;
-    snake->length = current_length + 1;
+    snake->length++;
 }
 
 void snake_turn(Snake *snake, Direction new_direction) {
