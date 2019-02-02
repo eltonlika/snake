@@ -182,15 +182,34 @@ void game_free(Game *game) {
 }
 
 void game_queue_input(Game *game, GameInput input) {
+    const unsigned int input_queue_count = game->input_queue_count;
+
+    if(input == NoInput){
+        return;
+    }
+
+    /* do not queue new input if it is the same as the last input on queue */
+    if(input_queue_count > 0 && game->input_queue[input_queue_count - 1] == input){
+        return;
+    }
+
     /* if exceeding max_length then reallocate current max capacity + INPUT_QUEUE_INITIAL_CAPACITY */
-    if (game->input_queue_count >= game->input_queue_capacity) {
+    if (input_queue_count >= game->input_queue_capacity) {
         game->input_queue_capacity += INPUT_QUEUE_INITIAL_CAPACITY;
         game->input_queue = realloc(game->input_queue, sizeof(GameInput) * game->input_queue_capacity);
         ASSERT_ALLOC(game->input_queue);
     }
 
-    game->input_queue[game->input_queue_count] = input;
-    game->input_queue_count++;
+    if(input != KeyUp && input != KeyRight && input != KeyDown && input != KeyLeft){
+        /* bring game menu control inputs to the front of the queue */
+        memmove(game->input_queue + 1, game->input_queue, sizeof(Position) * input_queue_count);
+        game->input_queue[0] = input;
+    }else{
+        /* queue snake control inputs to the back of the queue */
+        game->input_queue[input_queue_count] = input;
+    }
+
+    game->input_queue_count = input_queue_count + 1;
 }
 
 void game_update(Game *game) {
