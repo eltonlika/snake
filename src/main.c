@@ -18,7 +18,7 @@ int main() {
     main_window = renderer->main_window;
 
     /* initialize curses input */
-    input_init(renderer->main_window);
+    input_init(main_window);
 
     /* initialize game structure */
     game = game_new(renderer->playfield_width, renderer->playfield_height);
