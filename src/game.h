@@ -28,7 +28,7 @@ typedef struct {
 
 Game *game_new(unsigned int game_width, unsigned int game_height);
 
-void game_queue_input(Game *game, GameInput input);
+void game_input(Game *game, GameInput input);
 
 void game_update(Game *game);
 

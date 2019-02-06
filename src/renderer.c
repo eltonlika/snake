@@ -25,7 +25,10 @@ Renderer *renderer_init() {
 
     werase(renderer->main_window);
     box(renderer->main_window, 0, 0); /* render main window border */
-    wrefresh(renderer->main_window);
+
+    touchwin(renderer->main_window);
+    wnoutrefresh(renderer->main_window);
+    doupdate();
 
     return renderer;
 }
@@ -36,9 +39,9 @@ void renderer_free(Renderer *renderer) {
     }
 }
 
-static const char food_character = 'X';
-static const char body_character = '#';
-static const char head_characters[4] = {'A', '>', 'V', '<'};
+static const char food_character = 'x';
+static const char body_character = 'o';
+static const char head_characters[4] = {'^', '>', 'v', '<'};
 
 void renderer_render(Renderer *renderer, Game *game) {
     const Snake *snake = &game->snake;
@@ -47,6 +50,7 @@ void renderer_render(Renderer *renderer, Game *game) {
     const Position food_pos = game->food;
     const unsigned int snake_length = snake->length;
     const char head_character = head_characters[snake->direction];
+    WINDOW *main_window = renderer->main_window;
     WINDOW *playfield_window = renderer->playfield_window;
     Position cell_pos;
     unsigned int idx;
@@ -74,8 +78,10 @@ void renderer_render(Renderer *renderer, Game *game) {
                   game->score);
     }
 
-    /* refresh playground window to draw new renderings */
-    wrefresh(playfield_window);
+    /* refresh playfield_window to draw new renderings */
+    touchwin(main_window);
+    wnoutrefresh(main_window);
+    doupdate();
 }
 
 void renderer_end(Renderer *renderer) {

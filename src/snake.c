@@ -30,9 +30,10 @@ Position snake_get_next_head_position(Snake *snake) {
 }
 
 Bool snake_occupies_position(Snake *snake, Position position) {
+    const Position *snake_cells = snake->cells;
     unsigned int idx;
     for (idx = 0; idx < snake->length; idx++) {
-        if (position_equal(snake->cells[idx], position)) {
+        if (position_equal(snake_cells[idx], position)) {
             return True;
         }
     }

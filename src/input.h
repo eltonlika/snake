@@ -1,6 +1,7 @@
 #ifndef INPUT_H
 #define INPUT_H
 
+#include "utils.h"
 #include <curses.h>
 
 typedef enum {
@@ -19,5 +20,7 @@ typedef enum {
 void input_init(WINDOW *window);
 
 GameInput input_get_next_key(WINDOW *window);
+
+Bool input_is_snake_control(GameInput input);
 
 #endif /* INPUT_H */

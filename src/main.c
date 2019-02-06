@@ -31,7 +31,7 @@ int main() {
 
         /* add all buffered input keys to game input queue */
         while ((input_key = input_get_next_key(main_window)) != NoInput) {
-            game_queue_input(game, input_key);
+            game_input(game, input_key);
         }
 
         /* update game */

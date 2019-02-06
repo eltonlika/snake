@@ -1,4 +1,5 @@
 #include "input.h"
+#include "utils.h"
 #include <curses.h>
 
 void input_init(WINDOW *window) {
@@ -37,5 +38,17 @@ GameInput input_get_next_key(WINDOW *window) {
         return KeySpeedDecrease;
     default:
         return NoInput;
+    }
+}
+
+Bool input_is_snake_control(GameInput input) {
+    switch (input) {
+    case KeyUp:
+    case KeyRight:
+    case KeyDown:
+    case KeyLeft:
+        return True;
+    default:
+        return False;
     }
 }
