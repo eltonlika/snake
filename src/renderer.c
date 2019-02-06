@@ -50,8 +50,8 @@ void renderer_render(Renderer *renderer, Game *game) {
     const Position food_pos = game->food;
     const unsigned int snake_length = snake->length;
     const char head_character = head_characters[snake->direction];
-    WINDOW *main_window = renderer->main_window;
     WINDOW *playfield_window = renderer->playfield_window;
+    WINDOW *main_window = renderer->main_window;
     Position cell_pos;
     unsigned int idx;
 
@@ -69,12 +69,21 @@ void renderer_render(Renderer *renderer, Game *game) {
     /* render food */
     mvwaddch(playfield_window, food_pos.y, food_pos.x, food_character);
 
+    /* render score */
+    mvwprintw(main_window, 0, renderer->playfield_width - 20, " Score: %d ", game->score);
+
     /* if game over then print score */
     if (game->status == GameOver) {
         mvwprintw(playfield_window,
                   (renderer->playfield_height >> 1) - 1, /* divide by 2 */
                   (renderer->playfield_width >> 1) - 10, /* divide by 2 */
                   "Game Over! Score: %d",
+                  game->score);
+    } else if (game->status == Paused) {
+        mvwprintw(playfield_window,
+                  (renderer->playfield_height >> 1) - 1, /* divide by 2 */
+                  (renderer->playfield_width >> 1) - 10, /* divide by 2 */
+                  "Paused. Score: %d",
                   game->score);
     }
 
