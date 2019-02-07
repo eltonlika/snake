@@ -19,8 +19,6 @@ Bool position_equal(Position p1, Position p2);
 
 Position position_random(int min_x, int min_y, int max_x, int max_y);
 
-Position position_previous(Position position, Direction direction);
-
 Position position_next(Position position, Direction direction);
 
 #endif /* POSITION_H */

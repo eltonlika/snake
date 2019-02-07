@@ -15,7 +15,7 @@ typedef enum {
 typedef struct {
     unsigned int width;
     unsigned int height;
-    unsigned int score_multiplier;
+    unsigned int max_snake_length;
     unsigned int score;
     unsigned int milliseconds_per_frame;
     unsigned int input_queue_capacity;
@@ -27,7 +27,7 @@ typedef struct {
     GameInput *input_queue;
 } Game;
 
-Game *game_new(unsigned int game_width, unsigned int game_height);
+Game *game_new(unsigned int game_width, unsigned int game_height, Bool walls);
 
 void game_input(Game *game, GameInput input);
 

@@ -7,21 +7,21 @@
 static const float MILLISECONDS_PER_FRAME = 100;
 static const unsigned int INPUT_QUEUE_INITIAL_CAPACITY = 32;
 
-static Bool position_outside_limits(Position position, int game_width, int game_height){
+static Bool position_outside_limits(Position position, int game_width, int game_height) {
     return (position.x < 0 || position.x >= game_width ||
             position.y < 0 || position.y >= game_height);
 }
 
-static Position position_wrap_around(Position position, int game_width, int game_height){
-    if(position.x < 0) {
+static Position position_wrap_around(Position position, int game_width, int game_height) {
+    if (position.x < 0) {
         position.x += game_width;
-    }else if(position.x >= game_width) {
+    } else if (position.x >= game_width) {
         position.x -= game_width;
     }
 
-    if(position.y < 0) {
+    if (position.y < 0) {
         position.y += game_height;
-    }else if(position.y >= game_height) {
+    } else if (position.y >= game_height) {
         position.y -= game_height;
     }
 
@@ -29,9 +29,8 @@ static Position position_wrap_around(Position position, int game_width, int game
 }
 
 static Bool collides_walls(Game *game, Position check_position) {
-    return  game->walls &&
-            (check_position.x <= 0 || check_position.x >= ((int)game->width - 1) ||
-             check_position.y <= 0 || check_position.y >= ((int)game->height - 1));
+    return (check_position.x == 0 || check_position.x == ((int)game->width - 1) ||
+            check_position.y == 0 || check_position.y == ((int)game->height - 1));
 }
 
 static Bool collides_snake(Game *game, Position check_position) {
@@ -48,31 +47,62 @@ static Bool collides_food(Game *game, Position check_position) {
     return position_equal(game->food, check_position);
 }
 
-static void game_set_walls(Game *game, Bool enable_walls){
-    if(!game->walls && enable_walls){
-        game->score_multiplier = 2;
-        game->walls = enable_walls;
-
-        if(position_outside_limits(game->food, game->width, game->height)){
-            generate_random_food(game);
-        }
-    }
+static Bool max_snake_length_reached(Game *game) {
+    return game->snake.length >= game->max_snake_length;
 }
 
-/* generate random food position which does not collide with snake body */
+/* generate random food position which does not collide with snake body or walls */
 static void generate_random_food(Game *game) {
-    const unsigned int max_x = game->width - 1;
-    const unsigned int max_y = game->height - 1;
     const Position old_food_position = game->food;
     Snake *snake = &game->snake;
+    int min_x, min_y, max_x, max_y;
     Position new_random_food_position;
 
+    if (game->walls) {
+        min_x = 1;
+        min_y = 1;
+        max_x = game->width - 2;
+        max_y = game->height - 2;
+    } else {
+        min_x = 0;
+        min_y = 0;
+        max_x = game->width - 1;
+        max_y = game->height - 1;
+    }
+
     do {
-        new_random_food_position = position_random(max_x, max_y);
+        new_random_food_position = position_random(min_x, min_y, max_x, max_y);
     } while (snake_occupies_position(snake, new_random_food_position) ||
              position_equal(old_food_position, new_random_food_position));
 
     game->food = new_random_food_position;
+}
+
+static Bool game_toggle_walls(Game *game) {
+    unsigned int idx;
+
+    if (game->walls) {
+        game->walls = False;
+        game->max_snake_length = game->width * game->height;
+    } else {
+        game->walls = True;
+        game->max_snake_length = (game->width - 2) * (game->height - 2);
+
+        /* if snake is over walls then game over */
+        for (idx = 0; idx < game->snake.length; idx++) {
+            if (collides_walls(game, game->snake.cells[idx])) {
+                game->status = GameOver;
+                return True;
+            }
+        }
+
+        /* if food is over walls then move food to new random location */
+        if (collides_walls(game, game->food)) {
+            generate_random_food(game);
+        }
+    }
+
+    return game->walls;
 }
 
 static void game_init(Game *game, unsigned int game_width, unsigned int game_height, Bool walls) {
@@ -92,35 +122,34 @@ static void game_init(Game *game, unsigned int game_width, unsigned int game_hei
     initial_snake_position.y = (int)game_height >> 1;
     snake_init(&game->snake, initial_snake_position, DirectionLeft);
 
-    game->walls = walls;
     game->width = game_width;
     game->height = game_height;
-    game->score_multiplier = walls ? 2 : 1; 
-    game->max_score = (game_width * game_height) - 1;
+    game->max_snake_length = walls ? ((game_width - 2) * (game_height - 2)) : (game_width * game_height);
     game->score = 0;
     game->milliseconds_per_frame = MILLISECONDS_PER_FRAME;
+    game->walls = walls;
     game->status = Playing;
+
     generate_random_food(game);
 }
 
 static void game_input_queue_add(Game *game, GameInput input) {
-    unsigned int input_queue_count = game->input_queue_count;
-
     /* do not queue new input if it is the same as the last input on queue */
-    if (input_queue_count > 0 && game->input_queue[input_queue_count - 1] == input) {
+    if (game->input_queue_count > 0 &&
+        game->input_queue[game->input_queue_count - 1] == input) {
         return;
     }
 
     /* if exceeding max_length then reallocate current max capacity + INPUT_QUEUE_INITIAL_CAPACITY */
-    if (input_queue_count >= game->input_queue_capacity) {
+    if (game->input_queue_count >= game->input_queue_capacity) {
         game->input_queue_capacity += INPUT_QUEUE_INITIAL_CAPACITY;
         game->input_queue = realloc(game->input_queue, sizeof(GameInput) * game->input_queue_capacity);
         ASSERT_ALLOC(game->input_queue);
     }
 
     /* queue snake control inputs to the back of the queue */
-    game->input_queue[input_queue_count] = input;
-    game->input_queue_count = input_queue_count + 1;
+    game->input_queue[game->input_queue_count] = input;
+    game->input_queue_count++;
 }
 
 static GameInput game_input_queue_pop(Game *game) {
@@ -135,26 +164,6 @@ static GameInput game_input_queue_pop(Game *game) {
     }
 
     return NoInput;
-}
-
-static void game_input_process_snake_control(Game *game, GameInput input) {
-    if (game->status == Playing) {
-        if (input == KeyUp) {
-            snake_turn(&game->snake, DirectionUp);
-        }
-
-        else if (input == KeyRight) {
-            snake_turn(&game->snake, DirectionRight);
-        }
-
-        else if (input == KeyDown) {
-            snake_turn(&game->snake, DirectionDown);
-        }
-
-        else if (input == KeyLeft) {
-            snake_turn(&game->snake, DirectionLeft);
-        }
-    }
 }
 
 static void game_input_process_menu_control(Game *game, GameInput input) {
@@ -189,6 +198,18 @@ static void game_input_process_menu_control(Game *game, GameInput input) {
             game->milliseconds_per_frame *= 1.1;
         }
     }
+
+    else if (input == KeySpeedReset) {
+        if (game->status == Playing) {
+            game->milliseconds_per_frame = MILLISECONDS_PER_FRAME;
+        }
+    }
+
+    else if (input == KeyToggleWalls) {
+        if (game->status == Playing) {
+            game_toggle_walls(game);
+        }
+    }
 }
 
 Game *game_new(unsigned int game_width, unsigned int game_height, Bool walls) {
@@ -213,8 +234,8 @@ void game_input(Game *game, GameInput input) {
 }
 
 void game_update(Game *game) {
-    GameInput input;
     Snake *snake;
+    GameInput input;
     Position next_head_position;
 
     /* if not playing then do not process updates */
@@ -222,13 +243,38 @@ void game_update(Game *game) {
         return;
     }
 
-    if (game->input_queue_count > 0) {
-        input = game_input_queue_pop(game);
-        game_input_process_snake_control(game, input);
+    snake = &game->snake;
+
+    /* check if has inputs to change snake direction */
+    input = game_input_queue_pop(game);
+    if (input != NoInput) {
+        if (input == KeyUp) {
+            snake_turn(snake, DirectionUp);
+        } else if (input == KeyRight) {
+            snake_turn(snake, DirectionRight);
+        } else if (input == KeyDown) {
+            snake_turn(snake, DirectionDown);
+        } else if (input == KeyLeft) {
+            snake_turn(snake, DirectionLeft);
+        }
     }
 
-    snake = &game->snake;
-    next_head_position = snake_get_next_head_position(snake);
+    /* calculate next head/forward position */
+    next_head_position = position_next(snake->cells[0], snake->direction);
+
+    if (game->walls) {
+        /* if game has walls then check if new snake head will collide with the walls */
+        if (collides_walls(game, next_head_position)) {
+            game->status = GameOver;
+            return;
+        }
+    } else {
+        /* if game has no walls then check if new snake head position
+            has overflown and needs to be wrapped around */
+        if (position_outside_limits(next_head_position, game->width, game->height)) {
+            next_head_position = position_wrap_around(next_head_position, game->width, game->height);
+        }
+    }
 
     /* check if snake will collide with itself */
     if (collides_snake(game, next_head_position)) {
@@ -236,23 +282,23 @@ void game_update(Game *game) {
         return;
     }
 
-    /* check if snake will collide with the walls */
-    if (collides_walls(game, next_head_position)) {
-        game->status = GameOver;
-        return;
-    }
-
-    /* check if snake's head will eat the food */
+    /* check if new snake head will eat the food */
     if (collides_food(game, next_head_position)) {
-        snake_step_forward(snake);
-        snake_grow(snake);
+        /* Note: there is no need to calculate and set the new tail cell position
+                 because it is going to be overwritten in the snake_step_forward call below
+                 with the second-to-last cell position value */
+        snake_grow(snake); /* increases snake->length and allocates memory for new cells */
         game->score++;
-        generate_random_food(game);
-        return;
+
+        if (max_snake_length_reached(game)) {
+            game->status = GameOver;
+        } else {
+            generate_random_food(game);
+        }
     }
 
-    /* step snake forward to next location */
-    snake_step_forward(snake);
+    /* step snake forward to next position */
+    snake_step_forward(snake, next_head_position);
 }
 
 void game_free(Game *game) {

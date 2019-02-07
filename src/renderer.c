@@ -4,35 +4,18 @@
 #include <stdlib.h>
 
 Renderer *renderer_init() {
-    unsigned int screen_width, screen_height;
-
     Renderer *renderer = malloc(sizeof(Renderer));
     ASSERT_ALLOC(renderer);
 
     /* create main window */
-    renderer->main_window = initscr();
+    renderer->window = initscr();
     curs_set(0); /* set cursor invisible */
 
     /* set playfield width and height smaller to account for main window borders */
-    getmaxyx(renderer->main_window, screen_height, screen_width);
-    renderer->playfield_width = screen_width - 2;
-    renderer->playfield_height = screen_height - 2;
+    getmaxyx(renderer->window, renderer->height, renderer->width);
 
-    /* create playfield window */
-    renderer->playfield_window = derwin(renderer->main_window,
-                                        renderer->playfield_height, renderer->playfield_width,
-                                        1, 1);
-
-    werase(renderer->main_window);
-
-    if(game->walls){
-        /* render main window border to act as walls */
-        box(renderer->main_window, 0, 0); 
-    }
-
-    touchwin(renderer->main_window);
-    wnoutrefresh(renderer->main_window);
-    doupdate();
+    werase(renderer->window);
+    wrefresh(renderer->window);
 
     return renderer;
 }
@@ -49,57 +32,58 @@ static const char head_characters[4] = {'^', '>', 'v', '<'};
 
 void renderer_render(Renderer *renderer, Game *game) {
     const Snake *snake = &game->snake;
-    const Position *cells = snake->cells;
-    const Position snake_head = cells[0];
-    const Position food_pos = game->food;
     const unsigned int snake_length = snake->length;
+    const Position *snake_cells = snake->cells;
+    const Position snake_head = snake_cells[0];
+    const Position food_pos = game->food;
     const char head_character = head_characters[snake->direction];
-    WINDOW *playfield_window = renderer->playfield_window;
-    WINDOW *main_window = renderer->main_window;
+    WINDOW *window = renderer->window;
     Position cell_pos;
     unsigned int idx;
 
-    werase(playfield_window);
+    werase(window);
+
+    /* if game has walls then render them at screen border */
+    if (game->walls) {
+        box(window, 0, 0);
+    }
+
+    /* render food */
+    mvwaddch(window, food_pos.y, food_pos.x, food_character);
 
     /* render tail */
     for (idx = 1; idx < snake_length; idx++) {
-        cell_pos = cells[idx];
-        mvwaddch(playfield_window, cell_pos.y, cell_pos.x, body_character);
+        cell_pos = snake_cells[idx];
+        mvwaddch(window, cell_pos.y, cell_pos.x, body_character);
     }
 
     /* render snake head */
-    mvwaddch(playfield_window, snake_head.y, snake_head.x, head_character);
-
-    /* render food */
-    mvwaddch(playfield_window, food_pos.y, food_pos.x, food_character);
+    mvwaddch(window, snake_head.y, snake_head.x, head_character);
 
     /* render score */
-    mvwprintw(main_window, 0, renderer->playfield_width - 20, " Score: %d ", game->score);
+    mvwprintw(window, 0, renderer->width - 20, " Score: %d ", game->score);
 
     /* if game over then print score */
     if (game->status == GameOver) {
-        mvwprintw(playfield_window,
-                  (renderer->playfield_height >> 1) - 1, /* divide by 2 */
-                  (renderer->playfield_width >> 1) - 10, /* divide by 2 */
+        mvwprintw(window,
+                  (renderer->height >> 1) - 1, /* divide by 2 */
+                  (renderer->width >> 1) - 11, /* divide by 2 */
                   "Game Over! Score: %d",
                   game->score);
     } else if (game->status == Paused) {
-        mvwprintw(playfield_window,
-                  (renderer->playfield_height >> 1) - 1, /* divide by 2 */
-                  (renderer->playfield_width >> 1) - 10, /* divide by 2 */
-                  "Paused. Score: %d",
+        mvwprintw(window,
+                  (renderer->height >> 1) - 1, /* divide by 2 */
+                  (renderer->width >> 1) - 34, /* divide by 2 */
+                  "Paused. Press 'p' to resume game, 'n' for new game or 'q' to quit.",
                   game->score);
     }
 
-    /* refresh playfield_window to draw new renderings */
-    touchwin(main_window);
-    wnoutrefresh(main_window);
-    doupdate();
+    /* refresh window to draw new renderings */
+    wrefresh(window);
 }
 
 void renderer_end(Renderer *renderer) {
-    werase(renderer->main_window);
-    delwin(renderer->playfield_window);
-    delwin(renderer->main_window);
+    werase(renderer->window);
+    delwin(renderer->window);
     endwin();
 }

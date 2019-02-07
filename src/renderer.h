@@ -5,10 +5,9 @@
 #include <curses.h>
 
 typedef struct {
-    unsigned int playfield_width;
-    unsigned int playfield_height;
-    WINDOW *main_window;
-    WINDOW *playfield_window;
+    unsigned int width;
+    unsigned int height;
+    WINDOW *window;
 } Renderer;
 
 Renderer *renderer_init();

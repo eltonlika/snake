@@ -18,15 +18,8 @@ Position position_random(int min_x, int min_y, int max_x, int max_y) {
     return random;
 }
 
-Position position_previous(Position position, Direction direction) {
-    position.x -= XDelta[direction];
-    position.y -= YDelta[direction];
-    return position;
-}
-
 Position position_next(Position position, Direction direction) {
     position.x += XDelta[direction];
     position.y += YDelta[direction];
     return position;
 }
-

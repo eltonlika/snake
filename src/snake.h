@@ -17,11 +17,9 @@ void snake_free(Snake *snake);
 
 Bool snake_occupies_position(Snake *snake, Position position);
 
-Position snake_get_next_head_position(Snake *snake);
-
-void snake_step_forward(Snake *snake);
-
 void snake_grow(Snake *snake);
+
+void snake_step_forward(Snake *snake, Position new_head_cell);
 
 void snake_turn(Snake *snake, Direction new_direction);
 
