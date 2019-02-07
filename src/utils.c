@@ -9,17 +9,7 @@ void random_init() {
 }
 
 int random_number(int min_num, int max_num) {
-    int low_num, hi_num;
-
-    if (min_num < max_num) {
-        low_num = min_num;
-        hi_num = max_num + 1; /* include max_num in output */
-    } else {
-        low_num = max_num + 1; /* include max_num in output */
-        hi_num = min_num;
-    }
-
-    return (rand() % (hi_num - low_num)) + low_num;
+    return (rand() % (max_num + 1 - min_num)) + min_num;
 }
 
 void timer_sleep(unsigned int milliseconds) {

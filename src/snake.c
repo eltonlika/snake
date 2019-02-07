@@ -25,10 +25,6 @@ void snake_free(Snake *snake) {
     }
 }
 
-Position snake_get_next_head_position(Snake *snake) {
-    return position_next(snake->cells[0], snake->direction);
-}
-
 Bool snake_occupies_position(Snake *snake, Position position) {
     const Position *snake_cells = snake->cells;
     unsigned int idx;
@@ -38,6 +34,10 @@ Bool snake_occupies_position(Snake *snake, Position position) {
         }
     }
     return False;
+}
+
+Position snake_get_next_head_position(Snake *snake) {
+    return position_next(snake->cells[0], snake->direction);
 }
 
 void snake_step_forward(Snake *snake) {

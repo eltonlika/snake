@@ -11,23 +11,22 @@ Bool position_equal(Position p1, Position p2) {
     return p1.x == p2.x && p1.y == p2.y;
 }
 
-Position position_random(unsigned int width, unsigned int height) {
+Position position_random(int min_x, int min_y, int max_x, int max_y) {
     Position random;
-    random.x = random_number(0, width);
-    random.y = random_number(0, height);
+    random.x = random_number(min_x, max_x);
+    random.y = random_number(min_y, max_y);
     return random;
 }
 
 Position position_previous(Position position, Direction direction) {
-    Position previous;
-    previous.x = position.x - XDelta[direction];
-    previous.y = position.y - YDelta[direction];
-    return previous;
+    position.x -= XDelta[direction];
+    position.y -= YDelta[direction];
+    return position;
 }
 
 Position position_next(Position position, Direction direction) {
-    Position next;
-    next.x = position.x + XDelta[direction];
-    next.y = position.y + YDelta[direction];
-    return next;
+    position.x += XDelta[direction];
+    position.y += YDelta[direction];
+    return position;
 }
+

@@ -24,7 +24,11 @@ Renderer *renderer_init() {
                                         1, 1);
 
     werase(renderer->main_window);
-    box(renderer->main_window, 0, 0); /* render main window border */
+
+    if(game->walls){
+        /* render main window border to act as walls */
+        box(renderer->main_window, 0, 0); 
+    }
 
     touchwin(renderer->main_window);
     wnoutrefresh(renderer->main_window);

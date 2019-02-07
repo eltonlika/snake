@@ -36,6 +36,12 @@ GameInput input_get_next_key(WINDOW *window) {
         return KeySpeedIncrease;
     case 'S':
         return KeySpeedDecrease;
+    case 'z':
+    case 'Z':
+        return KeySpeedReset;
+    case 'w':
+    case 'W':
+        return KeyToggleWalls;
     default:
         return NoInput;
     }

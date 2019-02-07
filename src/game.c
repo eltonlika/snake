@@ -7,7 +7,33 @@
 static const float MILLISECONDS_PER_FRAME = 100;
 static const unsigned int INPUT_QUEUE_INITIAL_CAPACITY = 32;
 
-/* collision & endgame checks */
+static Bool position_outside_limits(Position position, int game_width, int game_height){
+    return (position.x < 0 || position.x >= game_width ||
+            position.y < 0 || position.y >= game_height);
+}
+
+static Position position_wrap_around(Position position, int game_width, int game_height){
+    if(position.x < 0) {
+        position.x += game_width;
+    }else if(position.x >= game_width) {
+        position.x -= game_width;
+    }
+
+    if(position.y < 0) {
+        position.y += game_height;
+    }else if(position.y >= game_height) {
+        position.y -= game_height;
+    }
+
+    return position;
+}
+
+static Bool collides_walls(Game *game, Position check_position) {
+    return  game->walls &&
+            (check_position.x <= 0 || check_position.x >= ((int)game->width - 1) ||
+             check_position.y <= 0 || check_position.y >= ((int)game->height - 1));
+}
+
 static Bool collides_snake(Game *game, Position check_position) {
     Snake *snake = &game->snake;
     const Position last_cell_position = snake->cells[snake->length - 1];
@@ -18,19 +44,19 @@ static Bool collides_snake(Game *game, Position check_position) {
     return snake_occupies_position(snake, check_position);
 }
 
-static Bool collides_border(Game *game, Position check_position) {
-    const int newx = check_position.x;
-    const int newy = check_position.y;
-    return (newx < 0 || newx >= (int)game->width ||
-            newy < 0 || newy >= (int)game->height);
-}
-
 static Bool collides_food(Game *game, Position check_position) {
     return position_equal(game->food, check_position);
 }
 
-static Bool max_score_reached(Game *game) {
-    return game->score >= game->max_score;
+static void game_set_walls(Game *game, Bool enable_walls){
+    if(!game->walls && enable_walls){
+        game->score_multiplier = 2;
+        game->walls = enable_walls;
+
+        if(position_outside_limits(game->food, game->width, game->height)){
+            generate_random_food(game);
+        }
+    }
 }
 
 /* generate random food position which does not collide with snake body */
@@ -49,7 +75,7 @@ static void generate_random_food(Game *game) {
     game->food = new_random_food_position;
 }
 
-static void game_init(Game *game, unsigned int game_width, unsigned int game_height) {
+static void game_init(Game *game, unsigned int game_width, unsigned int game_height, Bool walls) {
     Position initial_snake_position;
 
     if (game->input_queue != NULL) {
@@ -66,8 +92,10 @@ static void game_init(Game *game, unsigned int game_width, unsigned int game_hei
     initial_snake_position.y = (int)game_height >> 1;
     snake_init(&game->snake, initial_snake_position, DirectionLeft);
 
+    game->walls = walls;
     game->width = game_width;
     game->height = game_height;
+    game->score_multiplier = walls ? 2 : 1; 
     game->max_score = (game_width * game_height) - 1;
     game->score = 0;
     game->milliseconds_per_frame = MILLISECONDS_PER_FRAME;
@@ -131,7 +159,7 @@ static void game_input_process_snake_control(Game *game, GameInput input) {
 
 static void game_input_process_menu_control(Game *game, GameInput input) {
     if (input == KeyNewGame) {
-        game_init(game, game->width, game->height);
+        game_init(game, game->width, game->height, game->walls);
     }
 
     else if (input == KeyPause) {
@@ -163,10 +191,10 @@ static void game_input_process_menu_control(Game *game, GameInput input) {
     }
 }
 
-Game *game_new(unsigned int game_width, unsigned int game_height) {
+Game *game_new(unsigned int game_width, unsigned int game_height, Bool walls) {
     Game *game = (Game *)malloc(sizeof(Game));
     ASSERT_ALLOC(game);
-    game_init(game, game_width, game_height);
+    game_init(game, game_width, game_height, walls);
     return game;
 }
 
@@ -208,8 +236,8 @@ void game_update(Game *game) {
         return;
     }
 
-    /* check if snake will collide with the borders/walls */
-    if (collides_border(game, next_head_position)) {
+    /* check if snake will collide with the walls */
+    if (collides_walls(game, next_head_position)) {
         game->status = GameOver;
         return;
     }
@@ -219,14 +247,7 @@ void game_update(Game *game) {
         snake_step_forward(snake);
         snake_grow(snake);
         game->score++;
-
-        /* if snake reached maximum score then game over */
-        if (max_score_reached(game)) {
-            game->status = GameOver;
-        } else {
-            generate_random_food(game);
-        }
-
+        generate_random_food(game);
         return;
     }
 

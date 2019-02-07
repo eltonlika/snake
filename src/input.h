@@ -14,7 +14,9 @@ typedef enum {
     KeyPause,
     KeyQuit,
     KeySpeedIncrease,
-    KeySpeedDecrease
+    KeySpeedDecrease,
+    KeySpeedReset,
+    KeyToggleWalls
 } GameInput;
 
 void input_init(WINDOW *window);

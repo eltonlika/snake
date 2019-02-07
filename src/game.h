@@ -15,11 +15,12 @@ typedef enum {
 typedef struct {
     unsigned int width;
     unsigned int height;
-    unsigned int max_score;
+    unsigned int score_multiplier;
     unsigned int score;
     unsigned int milliseconds_per_frame;
     unsigned int input_queue_capacity;
     unsigned int input_queue_count;
+    Bool walls;
     GameStatus status;
     Position food;
     Snake snake;

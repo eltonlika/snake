@@ -15,9 +15,9 @@ void snake_init(Snake *snake, Position initial_position, Direction initial_direc
 
 void snake_free(Snake *snake);
 
-Position snake_get_next_head_position(Snake *snake);
-
 Bool snake_occupies_position(Snake *snake, Position position);
+
+Position snake_get_next_head_position(Snake *snake);
 
 void snake_step_forward(Snake *snake);
 
