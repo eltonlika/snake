@@ -48,6 +48,14 @@ void renderer_render(Renderer *renderer, Game *game) {
         box(window, 0, 0);
     }
 
+    /* render score and frames per second */
+    mvwprintw(window,
+              0,
+              renderer->width - 30,
+              " Score: %d  -  fps: %d ",
+              game->score,
+              1000/game->milliseconds_per_frame);
+
     /* render food */
     mvwaddch(window, food_pos.y, food_pos.x, food_character);
 
@@ -59,9 +67,6 @@ void renderer_render(Renderer *renderer, Game *game) {
 
     /* render snake head */
     mvwaddch(window, snake_head.y, snake_head.x, head_character);
-
-    /* render score */
-    mvwprintw(window, 0, renderer->width - 20, " Score: %d ", game->score);
 
     /* if game over then print score */
     if (game->status == GameOver) {

@@ -78,6 +78,26 @@ static void generate_random_food(Game *game) {
     game->food = new_random_food_position;
 }
 
+static void game_speed_reset(Game *game){
+    game->milliseconds_per_frame = MILLISECONDS_PER_FRAME;
+}
+
+static void game_speed_increase(Game *game){
+    if((int)game->milliseconds_per_frame - 10 < 10){
+        game->milliseconds_per_frame = 10;
+    }else{
+        game->milliseconds_per_frame -= 10;
+    }
+}
+
+static void game_speed_decrease(Game *game){
+    if((int)game->milliseconds_per_frame + 10 > 500){
+        game->milliseconds_per_frame = 500;
+    }else{
+        game->milliseconds_per_frame += 10;
+    }
+}
+
 static Bool game_toggle_walls(Game *game) {
     unsigned int idx;
 
@@ -189,19 +209,19 @@ static void game_input_process_menu_control(Game *game, GameInput input) {
 
     else if (input == KeySpeedIncrease) {
         if (game->status == Playing) {
-            game->milliseconds_per_frame *= 0.9;
+            game_speed_increase(game);
         }
     }
 
     else if (input == KeySpeedDecrease) {
         if (game->status == Playing) {
-            game->milliseconds_per_frame *= 1.1;
+            game_speed_decrease(game);
         }
     }
 
     else if (input == KeySpeedReset) {
         if (game->status == Playing) {
-            game->milliseconds_per_frame = MILLISECONDS_PER_FRAME;
+            game_speed_reset(game);
         }
     }
 
