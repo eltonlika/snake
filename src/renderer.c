@@ -3,6 +3,9 @@
 #include <curses.h>
 #include <stdlib.h>
 
+#define FOOD_PAIR 1
+#define SNAKE_PAIR 2
+
 Renderer *renderer_init() {
     Renderer *renderer = malloc(sizeof(Renderer));
     ASSERT_ALLOC(renderer);
@@ -10,6 +13,16 @@ Renderer *renderer_init() {
     /* create main window */
     renderer->window = initscr();
     curs_set(0); /* set cursor invisible */
+
+    /* if supports colors then initialize them */
+    if (has_colors() == TRUE) {
+        start_color();
+        init_pair(FOOD_PAIR, COLOR_RED, COLOR_BLACK);
+        init_pair(SNAKE_PAIR, COLOR_GREEN, COLOR_BLACK);
+        renderer->color = True;
+    } else {
+        renderer->color = False;
+    }
 
     /* set playfield width and height smaller to account for main window borders */
     getmaxyx(renderer->window, renderer->height, renderer->width);
@@ -37,6 +50,7 @@ void renderer_render(Renderer *renderer, Game *game) {
     const Position snake_head = snake_cells[0];
     const Position food_pos = game->food;
     const char head_character = head_characters[snake->direction];
+    const Bool color = renderer->color;
     WINDOW *window = renderer->window;
     Position cell_pos;
     unsigned int idx;
@@ -54,12 +68,23 @@ void renderer_render(Renderer *renderer, Game *game) {
               renderer->width - 30,
               " Score: %d  -  fps: %d ",
               game->score,
-              1000/game->milliseconds_per_frame);
+              1000 / game->milliseconds_per_frame);
 
     /* render food */
+    if (color) {
+        attron(COLOR_PAIR(FOOD_PAIR));
+    }
     mvwaddch(window, food_pos.y, food_pos.x, food_character);
+    if (color) {
+        attroff(COLOR_PAIR(FOOD_PAIR));
+    }
 
-    /* render tail */
+    /* render snake */
+    if (color) {
+        attron(COLOR_PAIR(SNAKE_PAIR));
+    }
+
+    /* render snake tail */
     for (idx = 1; idx < snake_length; idx++) {
         cell_pos = snake_cells[idx];
         mvwaddch(window, cell_pos.y, cell_pos.x, body_character);
@@ -67,6 +92,10 @@ void renderer_render(Renderer *renderer, Game *game) {
 
     /* render snake head */
     mvwaddch(window, snake_head.y, snake_head.x, head_character);
+
+    if (color) {
+        attroff(COLOR_PAIR(SNAKE_PAIR));
+    }
 
     /* if game over then print score */
     if (game->status == GameOver) {

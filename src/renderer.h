@@ -7,6 +7,7 @@
 typedef struct {
     unsigned int width;
     unsigned int height;
+    Bool color;
     WINDOW *window;
 } Renderer;
 
