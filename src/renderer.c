@@ -29,7 +29,7 @@ Renderer *renderer_init() {
     /* set playfield width and height smaller to account for main window borders */
     getmaxyx(renderer->window, renderer->height, renderer->width);
 
-    werase(renderer->window);
+    wclear(renderer->window);
     wrefresh(renderer->window);
 
     return renderer;
