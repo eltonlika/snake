@@ -5,6 +5,7 @@
 
 #define FOOD_PAIR 1
 #define SNAKE_PAIR 2
+#define WALL_PAIR 3
 
 Renderer *renderer_init() {
     Renderer *renderer = malloc(sizeof(Renderer));
@@ -19,6 +20,7 @@ Renderer *renderer_init() {
         start_color();
         init_pair(FOOD_PAIR, COLOR_RED, COLOR_BLACK);
         init_pair(SNAKE_PAIR, COLOR_GREEN, COLOR_BLACK);
+        init_pair(WALL_PAIR, COLOR_BLUE, COLOR_BLACK);
         renderer->color = True;
     } else {
         renderer->color = False;
@@ -59,7 +61,13 @@ void renderer_render(Renderer *renderer, Game *game) {
 
     /* if game has walls then render them at screen border */
     if (game->walls) {
+        if (color) {
+            attron(COLOR_PAIR(WALL_PAIR));
+        }
         box(window, 0, 0);
+        if (color) {
+            attroff(COLOR_PAIR(WALL_PAIR));
+        }
     }
 
     /* render score and frames per second */
