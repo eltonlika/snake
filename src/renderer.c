@@ -74,9 +74,9 @@ void renderer_render(Renderer *renderer, Game *game) {
     mvwprintw(window,
               0,
               renderer->width - 30,
-              " Score: %d  -  fps: %d ",
+              " Score: %d  -  Speed: %s ",
               game->score,
-              1000 / game->milliseconds_per_frame);
+              SPEED_LEVELS_DESCR[game->speed_level]);
 
     /* render food */
     if (color) {

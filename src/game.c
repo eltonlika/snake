@@ -4,7 +4,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-static const float MILLISECONDS_PER_FRAME = 100;
+/* speed level values are milliseconds of wait time per game loop iteration */
+static const unsigned int SPEED_LEVELS[] = {400, 200, 133, 100, 80, 66, 57, 50, 25, 12, 6};
+const char *SPEED_LEVELS_DESCR[] = {"0.25x", "0.5x", "0.75x", "1x", "1.25x", "1.5x", "1.75x", "2x", "4x", "8x", "16x"};
+static const unsigned int NUM_OF_SPEED_LEVELS = sizeof(SPEED_LEVELS) / sizeof(SPEED_LEVELS[0]);
+static const unsigned int DEFAULT_SPEED_LEVEL = 3; /* default speed level is index of 1x (100ms) */
+
 static const unsigned int INPUT_QUEUE_INITIAL_CAPACITY = 32;
 
 static Bool position_outside_limits(Position position, int game_width, int game_height) {
@@ -78,23 +83,22 @@ static void generate_random_food(Game *game) {
     game->food = new_random_food_position;
 }
 
-static void game_speed_reset(Game *game){
-    game->milliseconds_per_frame = MILLISECONDS_PER_FRAME;
+static void game_speed_reset(Game *game) {
+    game->speed_level = DEFAULT_SPEED_LEVEL;
+    game->milliseconds_per_frame = SPEED_LEVELS[game->speed_level];
 }
 
-static void game_speed_increase(Game *game){
-    if((int)game->milliseconds_per_frame - 10 < 10){
-        game->milliseconds_per_frame = 10;
-    }else{
-        game->milliseconds_per_frame -= 10;
+static void game_speed_increase(Game *game) {
+    if (game->speed_level < (NUM_OF_SPEED_LEVELS - 1)) {
+        game->speed_level++;
+        game->milliseconds_per_frame = SPEED_LEVELS[game->speed_level];
     }
 }
 
-static void game_speed_decrease(Game *game){
-    if((int)game->milliseconds_per_frame + 10 > 500){
-        game->milliseconds_per_frame = 500;
-    }else{
-        game->milliseconds_per_frame += 10;
+static void game_speed_decrease(Game *game) {
+    if (game->speed_level > 0) {
+        game->speed_level--;
+        game->milliseconds_per_frame = SPEED_LEVELS[game->speed_level];
     }
 }
 
@@ -146,7 +150,8 @@ static void game_init(Game *game, unsigned int game_width, unsigned int game_hei
     game->height = game_height;
     game->max_snake_length = walls ? ((game_width - 2) * (game_height - 2)) : (game_width * game_height);
     game->score = 0;
-    game->milliseconds_per_frame = MILLISECONDS_PER_FRAME;
+    game->speed_level = DEFAULT_SPEED_LEVEL;
+    game->milliseconds_per_frame = SPEED_LEVELS[DEFAULT_SPEED_LEVEL];
     game->walls = walls;
     game->status = Playing;
 
@@ -254,19 +259,11 @@ void game_input(Game *game, GameInput input) {
 }
 
 void game_update(Game *game) {
-    Snake *snake;
-    GameInput input;
+    const GameInput input = game_input_queue_pop(game);
+    Snake *snake = &game->snake;
     Position next_head_position;
 
-    /* if not playing then do not process updates */
-    if (game->status != Playing) {
-        return;
-    }
-
-    snake = &game->snake;
-
     /* check if has inputs to change snake direction */
-    input = game_input_queue_pop(game);
     if (input != NoInput) {
         if (input == KeyUp) {
             snake_turn(snake, DirectionUp);

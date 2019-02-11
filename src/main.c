@@ -29,13 +29,15 @@ int main() {
     /* main game loop */
     while (game->status != Quit) {
 
-        /* add all buffered input keys to game input queue */
+        /* process all buffered input keys */
         while ((input_key = input_get_next_key(window)) != NoInput) {
             game_input(game, input_key);
         }
 
-        /* update game */
-        game_update(game);
+        if (game->status == Playing) {
+            /* update game physics */
+            game_update(game);
+        }
 
         /* render game */
         renderer_render(renderer, game);
