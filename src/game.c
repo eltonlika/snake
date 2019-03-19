@@ -12,34 +12,40 @@ static const unsigned int DEFAULT_SPEED_LEVEL = 3; /* default speed level is ind
 
 static const unsigned int INPUT_QUEUE_INITIAL_CAPACITY = 32;
 
-static Bool position_outside_limits(Position position, int game_width, int game_height) {
+static Bool position_outside_limits(const Position position, const int game_width, const int game_height) {
     return (position.x < 0 || position.x >= game_width ||
             position.y < 0 || position.y >= game_height);
 }
 
-static Position position_wrap_around(Position position, int game_width, int game_height) {
+static Position position_wrap_around(const Position position, const int game_width, const int game_height) {
+    Position wrapped_position;
+
     if (position.x < 0) {
-        position.x += game_width;
+        wrapped_position.x = position.x + game_width;
     } else if (position.x >= game_width) {
-        position.x -= game_width;
+        wrapped_position.x = position.x - game_width;
+    } else {
+        wrapped_position.x = position.x;
     }
 
     if (position.y < 0) {
-        position.y += game_height;
+        wrapped_position.y = position.y + game_height;
     } else if (position.y >= game_height) {
-        position.y -= game_height;
+        wrapped_position.y = position.y - game_height;
+    } else {
+        wrapped_position.y = position.y;
     }
 
-    return position;
+    return wrapped_position;
 }
 
-static Bool collides_walls(Game *game, Position check_position) {
+static Bool collides_walls(const Game *game, const Position check_position) {
     return (check_position.x == 0 || check_position.x == ((int)game->width - 1) ||
             check_position.y == 0 || check_position.y == ((int)game->height - 1));
 }
 
-static Bool collides_snake(Game *game, Position check_position) {
-    Snake *snake = &game->snake;
+static Bool collides_snake(const Game *game, const Position check_position) {
+    const Snake *snake = &game->snake;
     const Position last_cell_position = snake->cells[snake->length - 1];
     if (position_equal(check_position, last_cell_position)) {
         /* no self collision because the current last cell will move */
@@ -48,18 +54,18 @@ static Bool collides_snake(Game *game, Position check_position) {
     return snake_occupies_position(snake, check_position);
 }
 
-static Bool collides_food(Game *game, Position check_position) {
+static Bool collides_food(const Game *game, const Position check_position) {
     return position_equal(game->food, check_position);
 }
 
-static Bool max_snake_length_reached(Game *game) {
+static Bool max_snake_length_reached(const Game *game) {
     return game->snake.length >= game->max_snake_length;
 }
 
 /* generate random food position which does not collide with snake body or walls */
 static void generate_random_food(Game *game) {
     const Position old_food_position = game->food;
-    Snake *snake = &game->snake;
+    const Snake *snake = &game->snake;
     int min_x, min_y, max_x, max_y;
     Position new_random_food_position;
 
@@ -129,7 +135,7 @@ static Bool game_toggle_walls(Game *game) {
     return game->walls;
 }
 
-static void game_init(Game *game, unsigned int game_width, unsigned int game_height, Bool walls) {
+static void game_init(Game *game, const unsigned int game_width, const unsigned int game_height, const Bool walls) {
     Position initial_snake_position;
 
     if (game->input_queue != NULL) {
@@ -158,7 +164,7 @@ static void game_init(Game *game, unsigned int game_width, unsigned int game_hei
     generate_random_food(game);
 }
 
-static void game_input_queue_add(Game *game, GameInput input) {
+static void game_input_queue_add(Game *game, const GameInput input) {
     /* do not queue new input if it is the same as the last input on queue */
     if (game->input_queue_count > 0 &&
         game->input_queue[game->input_queue_count - 1] == input) {
@@ -191,7 +197,7 @@ static GameInput game_input_queue_pop(Game *game) {
     return NoInput;
 }
 
-static void game_input_process_menu_control(Game *game, GameInput input) {
+static void game_input_process_menu_control(Game *game, const GameInput input) {
     if (input == KeyNewGame) {
         game_init(game, game->width, game->height, game->walls);
     }
@@ -237,14 +243,14 @@ static void game_input_process_menu_control(Game *game, GameInput input) {
     }
 }
 
-Game *game_new(unsigned int game_width, unsigned int game_height, Bool walls) {
+Game *game_new(const unsigned int game_width, const unsigned int game_height, const Bool walls) {
     Game *game = (Game *)malloc(sizeof(Game));
     ASSERT_ALLOC(game);
     game_init(game, game_width, game_height, walls);
     return game;
 }
 
-void game_input(Game *game, GameInput input) {
+void game_input(Game *game, const GameInput input) {
     if (input == NoInput) {
         return;
     }

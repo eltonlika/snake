@@ -23,6 +23,6 @@ void input_init(WINDOW *window);
 
 GameInput input_get_next_key(WINDOW *window);
 
-Bool input_is_snake_control(GameInput input);
+Bool input_is_snake_control(const GameInput input);
 
 #endif /* INPUT_H */

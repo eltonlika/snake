@@ -8,9 +8,9 @@
 
 void random_init();
 
-int random_number(int min_num, int max_num);
+int random_number(const int min_num, const int max_num);
 
-void timer_sleep(unsigned int milliseconds);
+void timer_sleep(const unsigned int milliseconds);
 
 typedef enum {
     False = 0,

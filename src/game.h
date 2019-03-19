@@ -30,9 +30,9 @@ typedef struct {
     GameInput *input_queue;
 } Game;
 
-Game *game_new(unsigned int game_width, unsigned int game_height, Bool walls);
+Game *game_new(const unsigned int game_width, const unsigned int game_height, const Bool walls);
 
-void game_input(Game *game, GameInput input);
+void game_input(Game *game, const GameInput input);
 
 void game_update(Game *game);
 

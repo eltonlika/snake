@@ -15,10 +15,10 @@ typedef struct {
     int y;
 } Position;
 
-Bool position_equal(Position p1, Position p2);
+Bool position_equal(const Position p1, const Position p2);
 
-Position position_random(int min_x, int min_y, int max_x, int max_y);
+Position position_random(const int min_x, const int min_y, const int max_x, const int max_y);
 
-Position position_next(Position position, Direction direction);
+Position position_next(const Position position, const Direction direction);
 
 #endif /* POSITION_H */

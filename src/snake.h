@@ -11,16 +11,16 @@ typedef struct {
     Position *cells;
 } Snake;
 
-void snake_init(Snake *snake, Position initial_position, Direction initial_direction);
+void snake_init(Snake *snake, const Position initial_position, const Direction initial_direction);
 
 void snake_free(Snake *snake);
 
-Bool snake_occupies_position(Snake *snake, Position position);
+Bool snake_occupies_position(const Snake *snake, const Position position);
 
 void snake_grow(Snake *snake);
 
-void snake_step_forward(Snake *snake, Position new_head_cell);
+void snake_step_forward(Snake *snake, const Position new_head_cell);
 
-void snake_turn(Snake *snake, Direction new_direction);
+void snake_turn(Snake *snake, const Direction new_direction);
 
 #endif /* SNAKE_H */

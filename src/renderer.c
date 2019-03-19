@@ -45,7 +45,7 @@ static const char food_character = 'x';
 static const char body_character = 'o';
 static const char head_characters[4] = {'^', '>', 'v', '<'};
 
-void renderer_render(Renderer *renderer, Game *game) {
+void renderer_render(const Renderer *renderer, const Game *game) {
     const Snake *snake = &game->snake;
     const unsigned int snake_length = snake->length;
     const Position *snake_cells = snake->cells;

@@ -15,7 +15,7 @@ Renderer *renderer_init();
 
 void renderer_free(Renderer *renderer);
 
-void renderer_render(Renderer *renderer, Game *game);
+void renderer_render(const Renderer *renderer, const Game *game);
 
 void renderer_end(Renderer *renderer);
 

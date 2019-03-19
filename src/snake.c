@@ -5,7 +5,7 @@
 
 static const unsigned int SNAKE_INITIAL_CAPACITY = 4;
 
-void snake_init(Snake *snake, Position initial_position, Direction initial_direction) {
+void snake_init(Snake *snake, const Position initial_position, const Direction initial_direction) {
     if (snake->cells != NULL) {
         free(snake->cells);
     }
@@ -23,9 +23,10 @@ void snake_free(Snake *snake) {
     }
 }
 
-Bool snake_occupies_position(Snake *snake, Position position) {
+Bool snake_occupies_position(const Snake *snake, const Position position) {
     const Position *snake_cells = snake->cells;
-    unsigned int snake_length = snake->length, idx;
+    const unsigned int snake_length = snake->length;
+    unsigned int idx;
     for (idx = 0; idx < snake_length; idx++) {
         if (position_equal(snake_cells[idx], position)) {
             return True;
@@ -44,14 +45,14 @@ void snake_grow(Snake *snake) {
     snake->length++;
 }
 
-void snake_step_forward(Snake *snake, Position new_head_cell) {
+void snake_step_forward(Snake *snake, const Position new_head_cell) {
     /* copy existing snake cells except last cell, over the tail of snake */
     memmove(snake->cells + 1, snake->cells, sizeof(Position) * (snake->length - 1));
     /* set new head cell */
     snake->cells[0] = new_head_cell;
 }
 
-void snake_turn(Snake *snake, Direction new_direction) {
+void snake_turn(Snake *snake, const Direction new_direction) {
     const Direction current_direction = snake->direction;
     if (/* UP or DOWN direction changes are allowed only on LEFT or RIGHT existing directions */
         ((new_direction == DirectionUp || new_direction == DirectionDown) &&
