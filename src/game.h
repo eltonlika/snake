@@ -7,14 +7,16 @@
 
 extern const char *SPEED_LEVELS_DESCR[];
 
-typedef enum {
+typedef enum
+{
     Playing,
     Paused,
     GameOver,
     Quit
 } GameStatus;
 
-typedef struct {
+typedef struct
+{
     unsigned int width;
     unsigned int height;
     unsigned int max_snake_length;

@@ -4,7 +4,8 @@
 #include "position.h"
 #include "utils.h"
 
-typedef struct {
+typedef struct
+{
     unsigned int max_length;
     unsigned int length;
     Direction direction;

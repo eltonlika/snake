@@ -7,7 +7,8 @@
 #define SNAKE_PAIR 2
 #define WALL_PAIR 3
 
-Renderer *renderer_init() {
+Renderer *renderer_init()
+{
     Renderer *renderer = malloc(sizeof(Renderer));
     ASSERT_ALLOC(renderer);
 
@@ -16,13 +17,16 @@ Renderer *renderer_init() {
     curs_set(0); /* set cursor invisible */
 
     /* if supports colors then initialize them */
-    if (has_colors() == TRUE) {
+    if (has_colors() == TRUE)
+    {
         start_color();
         init_pair(FOOD_PAIR, COLOR_RED, COLOR_BLACK);
         init_pair(SNAKE_PAIR, COLOR_GREEN, COLOR_BLACK);
         init_pair(WALL_PAIR, COLOR_BLUE, COLOR_BLACK);
         renderer->color = True;
-    } else {
+    }
+    else
+    {
         renderer->color = False;
     }
 
@@ -35,8 +39,10 @@ Renderer *renderer_init() {
     return renderer;
 }
 
-void renderer_free(Renderer *renderer) {
-    if (renderer != NULL) {
+void renderer_free(Renderer *renderer)
+{
+    if (renderer != NULL)
+    {
         free(renderer);
     }
 }
@@ -45,7 +51,8 @@ static const char food_character = 'x';
 static const char body_character = 'o';
 static const char head_characters[4] = {'^', '>', 'v', '<'};
 
-void renderer_render(const Renderer *renderer, const Game *game) {
+void renderer_render(const Renderer *renderer, const Game *game)
+{
     const Snake *snake = &game->snake;
     const unsigned int snake_length = snake->length;
     const Position *snake_cells = snake->cells;
@@ -60,12 +67,15 @@ void renderer_render(const Renderer *renderer, const Game *game) {
     werase(window);
 
     /* if game has walls then render them at screen border */
-    if (game->walls) {
-        if (color) {
+    if (game->walls)
+    {
+        if (color)
+        {
             attron(COLOR_PAIR(WALL_PAIR));
         }
         box(window, 0, 0);
-        if (color) {
+        if (color)
+        {
             attroff(COLOR_PAIR(WALL_PAIR));
         }
     }
@@ -79,21 +89,25 @@ void renderer_render(const Renderer *renderer, const Game *game) {
               SPEED_LEVELS_DESCR[game->speed_level]);
 
     /* render food */
-    if (color) {
+    if (color)
+    {
         attron(COLOR_PAIR(FOOD_PAIR));
     }
     mvwaddch(window, food_pos.y, food_pos.x, food_character);
-    if (color) {
+    if (color)
+    {
         attroff(COLOR_PAIR(FOOD_PAIR));
     }
 
     /* render snake */
-    if (color) {
+    if (color)
+    {
         attron(COLOR_PAIR(SNAKE_PAIR));
     }
 
     /* render snake tail */
-    for (idx = 1; idx < snake_length; idx++) {
+    for (idx = 1; idx < snake_length; idx++)
+    {
         cell_pos = snake_cells[idx];
         mvwaddch(window, cell_pos.y, cell_pos.x, body_character);
     }
@@ -101,18 +115,22 @@ void renderer_render(const Renderer *renderer, const Game *game) {
     /* render snake head */
     mvwaddch(window, snake_head.y, snake_head.x, head_character);
 
-    if (color) {
+    if (color)
+    {
         attroff(COLOR_PAIR(SNAKE_PAIR));
     }
 
     /* if game over then print score */
-    if (game->status == GameOver) {
+    if (game->status == GameOver)
+    {
         mvwprintw(window,
                   (renderer->height >> 1) - 1, /* divide by 2 */
                   (renderer->width >> 1) - 11, /* divide by 2 */
                   "Game Over! Score: %d",
                   game->score);
-    } else if (game->status == Paused) {
+    }
+    else if (game->status == Paused)
+    {
         mvwprintw(window,
                   (renderer->height >> 1) - 1, /* divide by 2 */
                   (renderer->width >> 1) - 34, /* divide by 2 */
@@ -124,7 +142,8 @@ void renderer_render(const Renderer *renderer, const Game *game) {
     wrefresh(window);
 }
 
-void renderer_end(Renderer *renderer) {
+void renderer_end(Renderer *renderer)
+{
     werase(renderer->window);
     delwin(renderer->window);
     endwin();

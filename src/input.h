@@ -4,7 +4,8 @@
 #include "utils.h"
 #include <curses.h>
 
-typedef enum {
+typedef enum
+{
     NoInput = 0,
     KeyUp,
     KeyRight,

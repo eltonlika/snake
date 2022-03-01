@@ -4,7 +4,8 @@
 #include "utils.h"
 #include <stdio.h>
 
-int main() {
+int main()
+{
     Renderer *renderer;
     WINDOW *window;
     Game *game;
@@ -27,14 +28,17 @@ int main() {
     renderer_render(renderer, game);
 
     /* main game loop */
-    while (game->status != Quit) {
+    while (game->status != Quit)
+    {
 
         /* process all buffered input keys */
-        while ((input_key = input_get_next_key(window)) != NoInput) {
+        while ((input_key = input_get_next_key(window)) != NoInput)
+        {
             game_input(game, input_key);
         }
 
-        if (game->status == Playing) {
+        if (game->status == Playing)
+        {
             /* update game physics */
             game_update(game);
         }

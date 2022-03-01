@@ -3,14 +3,16 @@
 
 #include "utils.h"
 
-typedef enum {
+typedef enum
+{
     DirectionUp = 0,
     DirectionRight = 1,
     DirectionDown = 2,
     DirectionLeft = 3
 } Direction;
 
-typedef struct {
+typedef struct
+{
     int x;
     int y;
 } Position;

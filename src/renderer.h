@@ -4,7 +4,8 @@
 #include "game.h"
 #include <curses.h>
 
-typedef struct {
+typedef struct
+{
     unsigned int width;
     unsigned int height;
     Bool color;

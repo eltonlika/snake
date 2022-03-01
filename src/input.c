@@ -2,17 +2,20 @@
 #include "utils.h"
 #include <curses.h>
 
-void input_init(WINDOW *window) {
+void input_init(WINDOW *window)
+{
     noecho();
     cbreak();
     nodelay(window, TRUE);
     keypad(window, TRUE);
 }
 
-GameInput input_get_next_key(WINDOW *window) {
+GameInput input_get_next_key(WINDOW *window)
+{
     const int input = wgetch(window);
 
-    switch (input) {
+    switch (input)
+    {
     case ERR:
         return NoInput;
     case KEY_UP:
@@ -47,8 +50,10 @@ GameInput input_get_next_key(WINDOW *window) {
     }
 }
 
-Bool input_is_snake_control(const GameInput input) {
-    switch (input) {
+Bool input_is_snake_control(const GameInput input)
+{
+    switch (input)
+    {
     case KeyUp:
     case KeyRight:
     case KeyDown:

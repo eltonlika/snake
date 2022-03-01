@@ -12,13 +12,15 @@ int random_number(const int min_num, const int max_num);
 
 void timer_sleep(const unsigned int milliseconds);
 
-typedef enum {
+typedef enum
+{
     False = 0,
     True = 1
 } Bool;
 
 #define ASSERT_ALLOC(p)                                  \
-    if (p == NULL) {                                     \
+    if (p == NULL)                                       \
+    {                                                    \
         fprintf(stderr, "failed to allocate memory.\n"); \
         exit(-1);                                        \
     }
